@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Care Physiotherapy System | نظام العلاج الطبيعي المنزلي</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:#F7F6F3; --bg2:#EDECEA; --bg3:#E2E0DC; --bg4:#D4D1CC;
+  --text:#1C1B18; --text2:#6B6860; --text3:#A09D98;
+  --border:rgba(0,0,0,0.09); --border2:rgba(0,0,0,0.16);
+  --green:#1A8C62; --green-bg:#E8F5EF; --green-text:#0D5C40;
+  --amber:#B87210; --amber-bg:#FDF0DC; --amber-text:#7A4A08;
+  --red:#C94040; --red-bg:#FAEAEA; --red-text:#7A1A1A;
+  --blue:#2A72B8; --blue-bg:#E8F0FA; --blue-text:#1A4A80;
+  --purple:#6B5FCC; --purple-bg:#EEEDFB; --purple-text:#3D3580;
+  --radius:10px; --radius-sm:6px; --radius-xs:4px;
+  --shadow:0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --font:'IBM Plex Sans', -apple-system, sans-serif;
+  --mono:'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;line-height:1.5}
+input,select,textarea,button{font-family:var(--font);font-size:13px}
+
+/* ── LAYOUT ── */
+.shell{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--text);color:var(--bg);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto}
+.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.sidebar-logo h1{font-size:13px;font-weight:600;color:#fff;letter-spacing:.01em}
+.sidebar-logo p{font-size:10px;color:rgba(255,255,255,0.5);margin-top:3px;direction:rtl;text-align:right}
+.ver{display:inline-block;font-size:9px;font-family:var(--mono);color:rgba(255,255,255,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:3px;padding:1px 5px;margin-top:6px}
+.nav{flex:1;padding:10px 8px}
+.nav-sec{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:12px 10px 5px}
+.nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border:none;background:transparent;color:rgba(255,255,255,0.6);font-size:12px;font-weight:400;cursor:pointer;border-radius:var(--radius-sm);margin-bottom:1px;text-align:left;transition:all .15s}
+.nav-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
+.nav-btn.active{background:rgba(255,255,255,0.13);color:#fff;font-weight:500}
+.nav-btn .icon{width:20px;font-size:14px;flex-shrink:0;opacity:.7}
+.nav-btn.active .icon{opacity:1}
+.sidebar-foot{padding:14px;border-top:1px solid rgba(255,255,255,0.08)}
+.offline-badge{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:4px;padding:6px 10px;font-size:10px;color:rgba(255,255,255,0.5);font-family:var(--mono);margin-bottom:8px;line-height:1.6}
+.offline-badge span{color:#6ee7b7;font-weight:500}
+
+.main{margin-left:230px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg);border-bottom:1px solid var(--border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.page-title{font-size:15px;font-weight:600;color:var(--text)}
+.page-sub{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.content{padding:20px 22px;flex:1}
+
+/* ── PAGES ── */
+.page{display:none}.page.active{display:block}
+
+/* ── CARDS ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.04em}
+.card-title .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--green)}.dot-amber{background:var(--amber)}.dot-red{background:var(--red)}.dot-blue{background:var(--blue)}.dot-purple{background:var(--purple)}
+
+/* ── METRICS ── */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px;margin-bottom:14px}
+.metric{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;box-shadow:var(--shadow)}
+.metric-label{font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.metric-value{font-size:24px;font-weight:700;color:var(--text);line-height:1;font-variant-numeric:tabular-nums}
+.metric-sub{font-size:10px;color:var(--text3);margin-top:4px}
+.mv-green{color:var(--green)}.mv-amber{color:var(--amber)}.mv-red{color:var(--red)}.mv-blue{color:var(--blue)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:#fff;color:var(--text);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg2)}
+.btn-dark{background:var(--text);color:#fff;border-color:transparent}.btn-dark:hover{opacity:.88;background:var(--text)}
+.btn-green{background:var(--green);color:#fff;border-color:transparent}.btn-green:hover{opacity:.88}
+.btn-amber{background:var(--amber);color:#fff;border-color:transparent}.btn-amber:hover{opacity:.88}
+.btn-red{background:var(--red);color:#fff;border-color:transparent}.btn-red:hover{opacity:.88}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px}
+.btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+
+/* ── BADGES ── */
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;letter-spacing:.02em}
+.b-green{background:var(--green-bg);color:var(--green-text)}
+.b-amber{background:var(--amber-bg);color:var(--amber-text)}
+.b-red{background:var(--red-bg);color:var(--red-text)}
+.b-blue{background:var(--blue-bg);color:var(--blue-text)}
+.b-purple{background:var(--purple-bg);color:var(--purple-text)}
+.b-gray{background:var(--bg2);color:var(--text2)}
+
+/* ── FORMS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:#fff;color:var(--text);font-size:12px;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(42,114,184,0.1)}
+.field textarea{resize:vertical;line-height:1.5}
+
+/* ── CHECKBOXES ── */
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px}
+.check-item{display:flex;align-items:flex-start;gap:7px;padding:7px 9px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:11px;line-height:1.4;transition:border-color .15s}
+.check-item:hover{border-color:var(--border2)}
+.check-item input{margin:1px 0 0;flex-shrink:0;accent-color:var(--green)}
+.check-item.req{border-left:2px solid var(--red)}
+.check-item.warn{border-left:2px solid var(--amber)}
+
+/* ── PROGRESS BARS ── */
+.prog{display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:6px}
+.prog-label{width:100px;color:var(--text2);flex-shrink:0;font-size:10px}
+.prog-track{flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;transition:width .6s ease}
+.prog-val{width:32px;text-align:right;font-weight:600;font-family:var(--mono);font-size:11px}
+
+/* ── TABLES ── */
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{text-align:left;padding:7px 9px;background:var(--bg2);color:var(--text2);font-weight:600;font-size:9px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.tbl td{padding:7px 9px;border-bottom:1px solid var(--border);color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:var(--bg2)}
+
+/* ── TIMELINE ── */
+.timeline{padding-left:18px;border-left:2px solid var(--border);margin:8px 0}
+.tl-node{position:relative;padding:0 0 14px 16px}
+.tl-node:before{content:'';position:absolute;left:-10px;top:5px;width:16px;height:16px;border-radius:50%;border:2px solid var(--border2);background:#fff}
+.tl-node.tl-done:before{background:var(--green);border-color:var(--green)}
+.tl-node.tl-warn:before{background:var(--amber);border-color:var(--amber)}
+.tl-node.tl-bad:before{background:var(--red);border-color:var(--red)}
+.tl-node.tl-pending:before{background:var(--bg3);border-color:var(--bg4)}
+.tl-date{font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:2px}
+.tl-title{font-size:12px;font-weight:500}
+.tl-body{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.5}
+
+/* ── SCORE DISPLAY ── */
+.score-section{margin-bottom:8px}
+.score-lbl-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
+.score-lbl-row .lbl{color:var(--text2)}
+.score-lbl-row .val{font-weight:700;font-family:var(--mono)}
+.score-bar{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.score-fill{height:100%;border-radius:99px;transition:width .7s ease}
+
+/* ── RESULT BOX ── */
+.result-box{border-radius:var(--radius);padding:16px;margin-top:10px;border:1px solid transparent}
+.result-box.eligible{background:var(--green-bg);border-color:#b6dfc8}
+.result-box.conditional{background:var(--amber-bg);border-color:#f0d49a}
+.result-box.ineligible{background:var(--red-bg);border-color:#f0b8b8}
+.result-box.improving{background:var(--green-bg);border-color:#b6dfc8}
+.result-box.plateau{background:var(--amber-bg);border-color:#f0d49a}
+.result-box.declining{background:var(--red-bg);border-color:#f0b8b8}
+
+/* ── AVATAR ── */
+.avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-family:var(--mono)}
+
+/* ── PT ROW ── */
+.pt-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.pt-row:last-child{border-bottom:none}
+.pt-row:hover{opacity:.8}
+
+/* ── CAP BAR ── */
+.cap-bar-wrap{height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;position:relative;margin:4px 0}
+.cap-bar-fill{height:100%;border-radius:99px;transition:width .6s}
+.cap-marker{position:absolute;top:0;height:100%;width:2px;background:rgba(255,255,255,.7)}
+
+/* ── FLAG ROW ── */
+.flag-row{display:flex;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;line-height:1.5}
+.flag-row:last-child{border-bottom:none}
+.flag-icon{flex-shrink:0;font-weight:700}
+
+/* ── STAR BUTTONS ── */
+.star-btn{width:34px;height:34px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:#fff;font-size:18px;cursor:pointer;color:var(--bg4);transition:all .15s}
+.star-btn.on{background:var(--amber-bg);color:var(--amber);border-color:var(--amber)}
+
+/* ── SCALE BUTTONS ── */
+.scale-btn{min-width:28px;height:28px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:#fff;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);padding:0 5px;font-family:var(--mono);transition:all .15s}
+.scale-btn.on{background:var(--text);color:#fff;border-color:transparent}
+
+/* ── YN BUTTONS ── */
+.yn-btn{padding:6px 14px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:#fff;font-size:11px;cursor:pointer;color:var(--text2);transition:all .15s}
+.yn-yes{background:var(--green-bg);color:var(--green-text);border-color:var(--green)}
+.yn-no{background:var(--red-bg);color:var(--red-text);border-color:var(--red)}
+
+/* ── PIPELINE STEPS ── */
+.pipeline{display:flex;gap:3px;margin-bottom:12px;overflow-x:auto}
+.pipe-step{flex:1;min-width:70px;text-align:center;padding:7px 4px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:10px;background:#fff}
+.pipe-done{background:var(--green-bg);border-color:#b6dfc8;color:var(--green-text)}
+.pipe-active{background:var(--blue-bg);border-color:#a8c8f0;color:var(--blue-text);font-weight:600}
+.pipe-pending{color:var(--text3)}
+
+/* ── LONGITUDINAL VIEWS ── */
+.long-view-btn{color:var(--text2);background:#fff}
+.long-view-btn.active-view{background:var(--text);color:#fff;border-color:transparent}
+.long-dim-btn{color:var(--text2);background:#fff;font-size:10px;padding:4px 9px}
+.long-dim-btn.active-dim{background:var(--purple);color:#fff;border-color:transparent}
+
+/* Swimlane */
+.swimlane-wrap{min-width:600px;padding:16px}
+.swimlane-header{display:flex;margin-bottom:4px;padding-left:140px;}
+.swimlane-col-label{font-size:9px;font-family:var(--mono);color:var(--text3);text-align:center;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.swimlane-row{display:flex;align-items:center;margin-bottom:5px;gap:0;}
+.swimlane-label{width:140px;flex-shrink:0;font-size:11px;font-weight:500;color:var(--text);padding-right:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
+.swimlane-label:hover{color:var(--purple);}
+.swimlane-label small{display:block;font-size:9px;font-family:var(--mono);color:var(--text3);font-weight:400;}
+.swimlane-cells{display:flex;flex:1;gap:2px;}
+.swim-cell{flex:1;height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono);color:#fff;cursor:pointer;transition:transform .1s,opacity .1s;text-shadow:0 1px 2px rgba(0,0,0,0.25);}
+.swim-cell:hover{transform:scaleY(1.08);opacity:.9;}
+.swim-cell.empty{background:var(--bg3);color:var(--text3);font-size:8px;text-shadow:none;cursor:default;}
+
+/* Heatmap */
+.heatmap-wrap{min-width:600px;padding:16px}
+.heatmap-grid{display:grid;gap:3px;}
+.hm-cell{height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono);cursor:pointer;transition:transform .12s;}
+.hm-cell:hover{transform:scale(1.05);}
+.hm-empty{background:var(--bg3);color:var(--text3);font-size:8px;}
+
+/* Score layers */
+.layers-wrap{min-width:600px;padding:16px;}
+.layer-row{margin-bottom:14px;}
+.layer-title{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);margin-bottom:5px;font-family:var(--mono);}
+.layer-bars{display:flex;gap:3px;align-items:flex-end;height:60px;}
+.layer-bar{flex:1;border-radius:3px 3px 0 0;cursor:pointer;min-height:4px;transition:opacity .15s;position:relative;}
+.layer-bar:hover{opacity:.8;}
+.layer-bar-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:8px;font-family:var(--mono);color:var(--text3);white-space:nowrap;overflow:hidden;max-width:60px;text-overflow:ellipsis;}
+.layer-bar-val{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;font-family:var(--mono);}
+
+/* Timeline */
+.vtl-wrap{min-width:600px;padding:16px;}
+.vtl-track{display:flex;align-items:center;margin-bottom:10px;gap:0;}
+.vtl-name{width:140px;flex-shrink:0;font-size:11px;font-weight:500;padding-right:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
+.vtl-name:hover{color:var(--purple);}
+.vtl-name small{display:block;font-size:9px;color:var(--text3);font-family:var(--mono);}
+.vtl-line{flex:1;position:relative;height:20px;}
+.vtl-spine{position:absolute;top:50%;height:2px;background:var(--bg3);left:0;right:0;transform:translateY(-50%);}
+.vtl-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;font-family:var(--mono);color:#fff;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:transform .12s;z-index:2;text-shadow:0 1px 1px rgba(0,0,0,0.2);}
+.vtl-dot:hover{transform:translate(-50%,-50%) scale(1.3);z-index:3;}
+.vtl-dot.no-visit{background:var(--bg3);color:var(--text3);}
+
+/* Detail panel */
+.dim-strip{display:flex;gap:3px;margin-bottom:8px;}
+.dim-chip{flex:1;padding:7px 4px;border-radius:4px;text-align:center;font-size:10px;font-weight:700;font-family:var(--mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.2);}
+.dim-chip small{display:block;font-size:8px;font-weight:400;opacity:.85;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}
+
+.split{display:grid;grid-template-columns:240px 1fr;gap:12px}
+@media(max-width:700px){.split{grid-template-columns:1fr}}
+.split-sidebar{max-height:75vh;overflow-y:auto}
+
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:680px){.two-col{grid-template-columns:1fr}}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:2rem 1rem;color:var(--text3);font-size:12px}
+.ref{font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);line-height:1.7}
+.section-title{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);margin:14px 0 6px}
+.divider{height:1px;background:var(--border);margin:12px 0}
+.nps-big{font-size:52px;font-weight:700;text-align:center;font-family:var(--mono);padding:8px 0}
+.info-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--mono);padding:4px 8px;background:var(--bg2);border-radius:3px;color:var(--text2);border:1px solid var(--border)}
+
+/* ── MOBILE ── */
+.hamburger{display:none;background:none;border:none;cursor:pointer;font-size:22px;color:var(--text)}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger{display:block}
+  .content{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h1>Home Care Physio</h1>
+    <p>نظام العلاج الطبيعي المنزلي</p>
+    <span class="ver">v2.0 · OFFLINE · NO API KEY</span>
+  </div>
+
+  <div class="nav">
+    <div class="nav-sec">Clinical</div>
+    <button class="nav-btn active" onclick="showPage('dashboard',this)"><span class="icon">⬜</span> Dashboard</button>
+    <button class="nav-btn" onclick="showPage('screening',this)"><span class="icon">📋</span> Admission Screening</button>
+    <button class="nav-btn" onclick="showPage('visits',this)"><span class="icon">🩺</span> Visit Tracker</button>
+    <button class="nav-btn" onclick="showPage('longitudinal',this)"><span class="icon">📈</span> Longitudinal Tracking</button>
+
+    <div class="nav-sec">Management</div>
+    <button class="nav-btn" onclick="showPage('cases',this)"><span class="icon">👥</span> Case Management</button>
+    <button class="nav-btn" onclick="showPage('caseload',this)"><span class="icon">⚖️</span> Caseload Control</button>
+    <button class="nav-btn" onclick="showPage('waitlist',this)"><span class="icon">📝</span> Waitlist</button>
+
+    <div class="nav-sec">Quality</div>
+    <button class="nav-btn" onclick="showPage('audit',this)"><span class="icon">🔍</span> Provider Audit</button>
+    <button class="nav-btn" onclick="showPage('survey',this)"><span class="icon">😊</span> Satisfaction Survey</button>
+    <button class="nav-btn" onclick="showPage('guidelines',this)"><span class="icon">📚</span> References</button>
+  </div>
+
+  <div class="sidebar-foot">
+    <div class="offline-badge">
+      <span>● OFFLINE MODE</span><br>
+      بيانات محلية 100%<br>
+      لا يحتاج إنترنت أو API
+    </div>
+    <button class="btn btn-sm" style="width:100%;background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.2);" onclick="loadDemoData()">📦 Load demo data</button>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <div>
+        <div class="page-title" id="page-title">Dashboard</div>
+        <div class="page-sub" id="page-sub">Saudi MOH 2024 · CBAHI · NICE NG21 · CMS Ch.7 · CG021 · APTA · CSP AGILE 2013</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="info-chip">⚡ Rule-based scoring</span>
+      <span class="info-chip" id="tb-date"></span>
+      <button class="btn btn-dark btn-sm" onclick="showPage('visits',document.querySelectorAll('.nav-btn')[2])">+ New visit</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+  <!-- ══════════ DASHBOARD ══════════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="metric-grid" id="dash-metrics"></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><span class="dot dot-purple"></span>Home care quality indicators</div>
+        <div id="dash-hcqi"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-blue"></span>Recent patients</div>
+        <div id="dash-patients"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-red"></span>Priority alerts</div>
+      <div id="dash-alerts"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREENING ══════════ -->
+  <div class="page" id="page-screening">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>New patient admission screening</div>
+      <div class="form-row">
+        <div class="field"><label>Patient name</label><input id="sc-name" placeholder="Full name"/></div>
+        <div class="field"><label>Date of birth</label><input type="date" id="sc-dob"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Primary diagnosis</label><input id="sc-dx" placeholder="e.g. I63.9 Post-stroke"/></div>
+        <div class="field"><label>Referring physician</label><input id="sc-physician" placeholder="Dr. name + specialty"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Preferred provider</label>
+          <select id="sc-provider"><option>International Medical Center</option><option>Fakeeh Hospital</option><option>Erfan Hospital</option><option>Saudi German Hospital</option></select>
+        </div>
+        <div class="field"><label>Comorbidities</label><input id="sc-comorbid" placeholder="DM, HTN, CKD..."/></div>
+      </div>
+
+      <div class="section-title">Homebound criteria — Saudi MOH / CMS Ch.7 (select all that apply)</div>
+      <div class="check-grid">
+        <label class="check-item req"><input type="checkbox" name="hb" value="medical"/> Cannot leave home — medical condition</label>
+        <label class="check-item req"><input type="checkbox" name="hb" value="advised"/> Physician advised to remain home</label>
+        <label class="check-item req"><input type="checkbox" name="hb" value="effort"/> Leaves with considerable taxing effort</label>
+        <label class="check-item req"><input type="checkbox" name="hb" value="assistive"/> Requires assistive device / assistance</label>
+        <label class="check-item req"><input type="checkbox" name="hb" value="postop"/> Post-surgical mobility restrictions</label>
+        <label class="check-item req"><input type="checkbox" name="hb" value="neuro"/> Neurological impairment limiting mobility</label>
+      </div>
+
+      <div class="section-title">Mandatory clinical criteria — CG021 (all 6 must be met for eligibility)</div>
+      <div class="check-grid">
+        <label class="check-item req"><input type="checkbox" id="cl-1"/> Valid physician order on file</label>
+        <label class="check-item req"><input type="checkbox" id="cl-2"/> Skilled PT required (not layperson)</label>
+        <label class="check-item req"><input type="checkbox" id="cl-3"/> Rehabilitation potential evident</label>
+        <label class="check-item req"><input type="checkbox" id="cl-4"/> Function lost due to injury / disease</label>
+        <label class="check-item req"><input type="checkbox" id="cl-5"/> Sustainable improvement expected</label>
+        <label class="check-item req"><input type="checkbox" id="cl-6"/> Licensed MOH-credentialed therapist</label>
+      </div>
+
+      <div class="section-title">Risk factors (check all present)</div>
+      <div class="check-grid">
+        <label class="check-item warn"><input type="checkbox" name="risk" value="fall"/> Fall risk — history of falls</label>
+        <label class="check-item warn"><input type="checkbox" name="risk" value="wound"/> Active wound / pressure injury</label>
+        <label class="check-item warn"><input type="checkbox" name="risk" value="nutrition"/> Malnutrition / nutritional deficiency</label>
+        <label class="check-item warn"><input type="checkbox" name="risk" value="cognitive"/> Cognitive impairment</label>
+        <label class="check-item warn"><input type="checkbox" name="risk" value="cardiac"/> Unstable cardiac condition</label>
+        <label class="check-item warn"><input type="checkbox" name="risk" value="dm"/> Uncontrolled diabetes HbA1c >9%</label>
+        <label class="check-item warn"><input type="checkbox" name="risk" value="respiratory"/> Oxygen-dependent / respiratory failure</label>
+        <label class="check-item warn"><input type="checkbox" name="risk" value="polypharm"/> Polypharmacy ≥5 medications</label>
+      </div>
+
+      <div class="section-title">Absolute exclusions — CG021 (any single = Ineligible)</div>
+      <div class="check-grid">
+        <label class="check-item req"><input type="checkbox" name="excl" value="not-homebound"/> Patient NOT homebound</label>
+        <label class="check-item req"><input type="checkbox" name="excl" value="no-improvement"/> No improvement expected</label>
+        <label class="check-item req"><input type="checkbox" name="excl" value="max-potential"/> Maximum rehab potential reached</label>
+        <label class="check-item req"><input type="checkbox" name="excl" value="refusal"/> Patient refuses treatment</label>
+        <label class="check-item req"><input type="checkbox" name="excl" value="custodial"/> Custodial / long-term care only</label>
+        <label class="check-item req"><input type="checkbox" name="excl" value="duplicate"/> Duplicate services elsewhere</label>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-dark" onclick="runScreening()">📋 Calculate eligibility</button>
+        <button class="btn" onclick="clearScreening()">Clear form</button>
+      </div>
+      <div id="sc-result"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>Screened patients history</div>
+      <div id="sc-history"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ VISITS ══════════ -->
+  <div class="page" id="page-visits">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>Record new visit — quality assessment</div>
+      <div class="form-row">
+        <div class="field"><label>Patient name</label><input id="v-name" placeholder="Name" list="v-pt-list"/><datalist id="v-pt-list"></datalist></div>
+        <div class="field"><label>Visit date</label><input type="date" id="v-date"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Provider</label>
+          <select id="v-provider"><option>International Medical Center</option><option>Fakeeh Hospital</option><option>Erfan Hospital</option><option>Saudi German Hospital</option></select>
+        </div>
+        <div class="field"><label>Diagnosis</label>
+          <select id="v-diagnosis">
+            <option>Post-stroke rehabilitation</option><option>Orthopedic — post-op knee</option>
+            <option>Orthopedic — hip replacement</option><option>Neurological — Parkinson's</option>
+            <option>Spinal cord injury</option><option>COPD / respiratory</option>
+            <option>Wound care + mobility</option><option>ALS / neurodegenerative</option>
+            <option>Cardiac rehabilitation</option><option>Pediatric — developmental</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title">Functional outcomes achieved — APTA / CSP AGILE (1 point each)</div>
+      <div class="check-grid" id="v-outcomes">
+        <label class="check-item"><input type="checkbox" value="Independent transfers"/> Independent transfers</label>
+        <label class="check-item"><input type="checkbox" value="Ambulation indoors"/> Ambulation indoors</label>
+        <label class="check-item"><input type="checkbox" value="Ambulation outdoors"/> Ambulation outdoors</label>
+        <label class="check-item"><input type="checkbox" value="Stair negotiation"/> Stair negotiation</label>
+        <label class="check-item"><input type="checkbox" value="ADL independence"/> ADL independence</label>
+        <label class="check-item"><input type="checkbox" value="Static balance"/> Balance — static</label>
+        <label class="check-item"><input type="checkbox" value="Dynamic balance"/> Balance — dynamic</label>
+        <label class="check-item"><input type="checkbox" value="Pain reduction"/> Pain reduction ≥50%</label>
+        <label class="check-item"><input type="checkbox" value="ROM normal"/> ROM within normal limits</label>
+        <label class="check-item"><input type="checkbox" value="Caregiver trained"/> Caregiver trained</label>
+      </div>
+
+      <div class="section-title">Documentation completeness — CMS Ch.7 / CG021 (mandatory)</div>
+      <div class="check-grid">
+        <label class="check-item req"><input type="checkbox" id="doc-1"/> SMART goals set</label>
+        <label class="check-item req"><input type="checkbox" id="doc-2"/> Frequency & duration documented</label>
+        <label class="check-item req"><input type="checkbox" id="doc-3"/> HEP given to patient</label>
+        <label class="check-item req"><input type="checkbox" id="doc-4"/> Discharge plan on file</label>
+        <label class="check-item req"><input type="checkbox" id="doc-5"/> Physician order present</label>
+        <label class="check-item req"><input type="checkbox" id="doc-6"/> Progress notes updated</label>
+      </div>
+
+      <div class="form-row" style="margin-top:10px;">
+        <div class="field"><label>Wound status</label>
+          <select id="v-wound"><option value="none">No active wound</option><option value="improving">Wound improving</option><option value="static">Wound static / no change</option><option value="pressure">Pressure injury present</option><option value="worsening">Wound worsening</option></select>
+        </div>
+        <div class="field"><label>Nutritional status</label>
+          <select id="v-nutrition"><option value="adequate">Adequate intake</option><option value="at-risk">At risk</option><option value="poor">Poor — supplement needed</option><option value="tube">Tube feeding / NGT</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>HEP compliance (0–10): <b id="v-hep-val">7</b></label><input type="range" min="0" max="10" value="7" step="1" id="v-hep" oninput="document.getElementById('v-hep-val').textContent=this.value"/></div>
+        <div class="field"><label>Patient engagement (0–10): <b id="v-eng-val">8</b></label><input type="range" min="0" max="10" value="8" step="1" id="v-eng" oninput="document.getElementById('v-eng-val').textContent=this.value"/></div>
+      </div>
+      <div class="field"><label>Provider clinical note</label><textarea id="v-note" rows="2" placeholder="Key clinical findings from this visit..."></textarea></div>
+      <div class="field"><label>Supervisor / reviewer comment</label><textarea id="v-comment" rows="2" placeholder="Quality observation..."></textarea></div>
+
+      <div class="btn-row">
+        <button class="btn btn-dark" onclick="calcAndPreview()">⚡ Calculate scores</button>
+        <button class="btn btn-green" onclick="saveVisit()">💾 Save visit</button>
+        <button class="btn" onclick="clearVisitForm()">Clear</button>
+      </div>
+      <div id="v-result"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ LONGITUDINAL ══════════ -->
+  <div class="page" id="page-longitudinal">
+
+    <!-- Controls -->
+    <div class="card" style="padding:12px 16px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:12px;font-weight:600;color:var(--text);">View</div>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-sm long-view-btn active-view" data-view="swimlane" onclick="setLongView('swimlane',this)">🏊 Swimlane</button>
+          <button class="btn btn-sm long-view-btn" data-view="heatmap" onclick="setLongView('heatmap',this)">🔥 Heat map</button>
+          <button class="btn btn-sm long-view-btn" data-view="layers" onclick="setLongView('layers',this)">📊 Score layers</button>
+          <button class="btn btn-sm long-view-btn" data-view="timeline" onclick="setLongView('timeline',this)">📅 Visit timeline</button>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:4px;">
+          <button class="btn btn-sm long-dim-btn active-dim" data-dim="overall" onclick="setLongDim('overall',this)">Overall</button>
+          <button class="btn btn-sm long-dim-btn" data-dim="functional" onclick="setLongDim('functional',this)">Functional</button>
+          <button class="btn btn-sm long-dim-btn" data-dim="doc" onclick="setLongDim('doc',this)">Documentation</button>
+          <button class="btn btn-sm long-dim-btn" data-dim="woundNutrition" onclick="setLongDim('woundNutrition',this)">Wound & Nutrition</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding:0 2px;">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--text2);"><span style="display:inline-block;width:28px;height:10px;background:#1A8C62;border-radius:2px;"></span>≥75% Improving</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--text2);"><span style="display:inline-block;width:28px;height:10px;background:#B87210;border-radius:2px;"></span>50–74% Plateau</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--text2);"><span style="display:inline-block;width:28px;height:10px;background:#C94040;border-radius:2px;"></span>&lt;50% Declining</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--text2);"><span style="display:inline-block;width:28px;height:10px;background:var(--bg3);border-radius:2px;"></span>No data</div>
+    </div>
+
+    <!-- Main view area -->
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div id="long-main" style="overflow-x:auto;"></div>
+    </div>
+
+    <!-- Detail panel — shown on click -->
+    <div id="long-detail" style="display:none;">
+      <div class="card">
+        <div class="card-title" id="long-detail-title"><span class="dot dot-purple"></span>Patient detail</div>
+        <div id="long-detail-body"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════ CASES ══════════ -->
+  <div class="page" id="page-cases">
+    <div class="split">
+      <div class="split-sidebar" id="cases-sidebar"></div>
+      <div id="cases-detail"><div class="empty" style="padding-top:3rem;">← Select a patient to view full case</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ CASELOAD ══════════ -->
+  <div class="page" id="page-caseload">
+    <div class="metric-grid" id="cl-metrics"></div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>Provider capacity utilisation</div>
+      <div id="cl-providers"></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><span class="dot dot-purple"></span>Monthly intake — 6 months</div>
+        <canvas id="cl-chart" height="160"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-green"></span>Discharge candidates</div>
+        <div id="cl-discharge"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-amber"></span>Capacity recommendation</div>
+      <div id="cl-recommendation"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ WAITLIST ══════════ -->
+  <div class="page" id="page-waitlist">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><span class="dot dot-blue"></span>Add to waitlist</div>
+        <div class="field"><label>Patient name</label><input id="wl-name" placeholder="Full name"/></div>
+        <div class="field"><label>Diagnosis</label><input id="wl-dx" placeholder="Diagnosis"/></div>
+        <div class="field"><label>Preferred provider</label>
+          <select id="wl-prov"><option value="any">Any available</option><option>International Medical Center</option><option>Fakeeh Hospital</option><option>Erfan Hospital</option><option>Saudi German Hospital</option></select>
+        </div>
+        <div class="field"><label>Urgency</label>
+          <select id="wl-urgency"><option value="1">🔴 P1 — Urgent</option><option value="2">🟠 P2 — High</option><option value="3" selected>🔵 P3 — Routine</option><option value="4">⚪ P4 — Elective</option></select>
+        </div>
+        <div class="field"><label>Eligibility</label>
+          <select id="wl-elig"><option value="Eligible">Eligible</option><option value="Conditional">Conditional</option><option value="Pending">Pending screening</option></select>
+        </div>
+        <div class="field"><label>Risk category</label>
+          <select id="wl-risk"><option value="Low">Low</option><option value="Moderate" selected>Moderate</option><option value="High">High</option><option value="Critical">Critical</option></select>
+        </div>
+        <div class="field"><label>Referral source</label><input id="wl-referral" placeholder="Hospital / physician"/></div>
+        <div class="btn-row"><button class="btn btn-dark" onclick="addToWaitlist()">+ Add to waitlist</button></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-amber"></span>Admission recommendation</div>
+        <div id="wl-recommendation"></div>
+        <div class="btn-row"><button class="btn btn-sm" onclick="calcWaitlistRec()">⚡ Recalculate recommendation</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-purple"></span>Current waitlist — priority ranked</div>
+      <div id="wl-body"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ AUDIT ══════════ -->
+  <div class="page" id="page-audit">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>Select provider & period</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="audit-selector"></div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        <button class="btn btn-sm" data-m="3" onclick="setAuditPeriod(3,this)">Last 3 months</button>
+        <button class="btn btn-sm" data-m="6" onclick="setAuditPeriod(6,this)">Last 6 months</button>
+        <button class="btn btn-sm" data-m="0" onclick="setAuditPeriod(0,this)">All time</button>
+      </div>
+      <div class="metric-grid" id="audit-metrics"></div>
+      <div class="btn-row"><button class="btn btn-dark" onclick="generateAudit()">🔍 Generate audit report</button></div>
+      <div id="audit-result"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ SURVEY ══════════ -->
+  <div class="page" id="page-survey">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><span class="dot dot-purple"></span>Program satisfaction overview</div>
+        <div class="metric-grid" id="sv-metrics"></div>
+        <div class="nps-big" id="sv-nps" style="color:var(--green);">–</div>
+        <div style="text-align:center;font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:10px;">NET PROMOTER SCORE</div>
+        <div id="sv-analysis"></div>
+        <div class="btn-row" style="justify-content:center;"><button class="btn btn-sm" onclick="calcSurveyAnalysis()">⚡ Analyse feedback</button></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-green"></span>Submit new survey</div>
+        <div class="field"><label>Patient name</label><input id="sv-patient" placeholder="Name or file number"/></div>
+        <div class="field"><label>Provider</label>
+          <select id="sv-prov"><option>International Medical Center</option><option>Fakeeh Hospital</option><option>Erfan Hospital</option><option>Saudi German Hospital</option></select>
+        </div>
+        <div class="field"><label>Overall satisfaction / الرضا الإجمالي</label>
+          <div style="display:flex;gap:5px;" id="sv-stars">
+            <button class="star-btn" onclick="setStar(1)">★</button><button class="star-btn" onclick="setStar(2)">★</button>
+            <button class="star-btn" onclick="setStar(3)">★</button><button class="star-btn" onclick="setStar(4)">★</button>
+            <button class="star-btn" onclick="setStar(5)">★</button>
+          </div>
+        </div>
+        <div class="field"><label>Recommend this service? (0–10) / هل توصي؟</label>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;" id="sv-nps-btns">
+            <script>for(let i=0;i<=10;i++) document.write(`<button class="scale-btn" onclick="setNPS(${i})">${i}</button>`);</script>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:3px;"><span>0 – Not likely</span><span>10 – Very likely</span></div>
+        </div>
+        <div class="field"><label>Felt safe? / هل شعرت بالأمان؟</label>
+          <div style="display:flex;gap:8px;"><button class="yn-btn" id="sv-safe-y" onclick="setSafe(1)">✓ Yes / نعم</button><button class="yn-btn" id="sv-safe-n" onclick="setSafe(0)">✕ No / لا</button></div>
+        </div>
+        <div class="field"><label>Received home exercise program? / تمارين منزلية؟</label>
+          <div style="display:flex;gap:8px;"><button class="yn-btn" id="sv-hep-y" onclick="setHEP(1)">✓ Yes / نعم</button><button class="yn-btn" id="sv-hep-n" onclick="setHEP(0)">✕ No / لا</button></div>
+        </div>
+        <div class="field"><label>Would use service again? / هل ستعود؟</label>
+          <div style="display:flex;gap:8px;"><button class="yn-btn" id="sv-rec-y" onclick="setRec(1)">✓ Yes / نعم</button><button class="yn-btn" id="sv-rec-n" onclick="setRec(0)">✕ No / لا</button></div>
+        </div>
+        <div class="field"><label>Comments / تعليقات</label><textarea id="sv-comment" rows="3" placeholder="Any comments or suggestions... أي تعليقات أو اقتراحات..."></textarea></div>
+        <div class="btn-row"><button class="btn btn-green" onclick="submitSurvey()">✓ Submit survey</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-amber"></span>Survey responses</div>
+      <div id="sv-list"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ GUIDELINES ══════════ -->
+  <div class="page" id="page-guidelines">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>Embedded clinical guidelines — scoring basis</div>
+      <div id="guidelines-body"></div>
+    </div>
+  </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ══════════════════════════════════════════════
+// DATA LAYER — localStorage only, no external calls
+// ══════════════════════════════════════════════
+const KEYS={visits:'hc_visits_v1',screened:'hc_screened_v1',waitlist:'hc_waitlist_v1',surveys:'hc_surveys_v1',settings:'hc_settings_v1'};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
+const load=(k,def=[])=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}};
+
+let visits=[], screened=[], waitlist=[], surveys=[], settings={};
+let selectedLong=null, selectedCase=null, selectedAuditProv=null, auditPeriod=3;
+let svStar=0, svNPS=null, svSafe=null, svHEP=null, svRec=null;
+let lastScores=null;
+const charts={};
+
+function init(){
+  visits=load(KEYS.visits);
+  screened=load(KEYS.screened);
+  waitlist=load(KEYS.waitlist);
+  surveys=load(KEYS.surveys);
+  settings=load(KEYS.settings,{
+    providers:[{name:'International Medical Center',maxCases:10},{name:'Fakeeh Hospital',maxCases:8},{name:'Erfan Hospital',maxCases:8},{name:'Saudi German Hospital',maxCases:7}],
+    maxMonthlyIntake:6, warningThreshold:80, autoDischargeScore:88, maxWaitDays:14
+  });
+  document.getElementById('v-date').value=today();
+  document.getElementById('tb-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  populateDatalist();
+  renderDashboard();
+  renderGuidelines();
+}
+
+// ── HELPERS ──
+const today=()=>new Date().toISOString().split('T')[0];
+const monthKey=d=>d?d.slice(0,7):'';
+const initials=n=>(n||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+const daysSince=d=>d?Math.floor((new Date()-new Date(d))/(864e5)):999;
+const monthsAgo=n=>{const d=new Date();d.setMonth(d.getMonth()-n);return d.toISOString().split('T')[0];};
+const scColor=s=>s>=75?'var(--green)':s>=50?'var(--amber)':'var(--red)';
+const scClass=s=>s>=75?'mv-green':s>=50?'mv-amber':'mv-red';
+const scLabel=s=>s>=75?'Improving':s>=50?'Plateau':'Declining';
+const badgeCls=s=>s>=75?'b-green':s>=50?'b-amber':'b-red';
+const getVisitsFor=name=>visits.filter(v=>v.name===name).sort((a,b)=>a.date.localeCompare(b.date));
+const clamp=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
+
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const titles={dashboard:'Dashboard',screening:'Admission Screening',visits:'Visit Tracker',longitudinal:'Longitudinal Tracking',cases:'Case Management',caseload:'Caseload Control',waitlist:'Waitlist',audit:'Provider Audit',survey:'Patient Satisfaction',guidelines:'Clinical References'};
+  document.getElementById('page-title').textContent=titles[id]||id;
+  document.getElementById('sidebar').classList.remove('open');
+  if(id==='longitudinal') renderLongitudinal();
+  if(id==='cases') renderCases();
+  if(id==='caseload') renderCaseload();
+  if(id==='waitlist'){renderWaitlist();calcWaitlistRec();}
+  if(id==='audit') renderAudit();
+  if(id==='survey') renderSurvey();
+  if(id==='screening') renderScHistory();
+}
+
+// ══════════════════════════════════════════════
+// RULE-BASED SCORING ENGINE
+// Based on: Saudi MOH HHC 2024, CBAHI, NICE NG21,
+// CMS Ch.7, CG021, APTA 3rd ed., CSP AGILE 2013
+// ══════════════════════════════════════════════
+function calcVisitScores(data){
+  const{outcomes,docChecks,hep,engagement,wound,nutrition}=data;
+
+  // 1. FUNCTIONAL SCORE — APTA / CSP AGILE outcome criteria
+  // Each of 10 outcomes = 10 points max
+  const functionalRaw=(outcomes.length/10)*100;
+  const functionalScore=clamp(Math.round(functionalRaw),0,100);
+
+  // 2. DOCUMENTATION SCORE — CMS Ch.7 / CG021 mandatory elements
+  // 6 mandatory elements, each = ~16.7 points
+  const docScore=clamp(Math.round((docChecks/6)*100),0,100);
+
+  // 3. CARE QUALITY — HEP + engagement (APTA), weighted
+  const hepScore=clamp(Math.round((parseInt(hep)/10)*100),0,100);
+  const engScore=clamp(Math.round((parseInt(engagement)/10)*100),0,100);
+  const careQualityScore=clamp(Math.round(hepScore*0.4+engScore*0.4+docScore*0.2),0,100);
+
+  // 4. WOUND & NUTRITION SCORE — Saudi MOH / NICE NG21
+  const woundMap={none:100,improving:75,static:45,pressure:25,worsening:10};
+  const nutritionMap={adequate:100,'at-risk':60,poor:30,tube:50};
+  const woundScore=woundMap[wound]||50;
+  const nutritionScore=nutritionMap[nutrition]||50;
+  const wnScore=clamp(Math.round(woundScore*0.5+nutritionScore*0.5),0,100);
+
+  // 5. OVERALL RECOVERY INDEX — weighted composite
+  // Weights: Functional 40%, Care Quality 25%, Documentation 20%, W&N 15%
+  const overall=clamp(Math.round(functionalScore*0.40+careQualityScore*0.25+docScore*0.20+wnScore*0.15),0,100);
+
+  // 6. STATUS
+  const status=overall>=75?'Improving':overall>=50?'Plateau':'Declining';
+
+  // 7. GUIDELINE FLAGS
+  const flags=[];
+  if(docChecks<4) flags.push('Documentation below CMS Ch.7 minimum — '+docChecks+'/6 elements');
+  if(docChecks<6) flags.push('Missing documentation: CG021 requires all 6 mandatory elements');
+  if(parseInt(hep)<5) flags.push('HEP compliance low — reassess patient education (APTA)');
+  if(wound==='pressure') flags.push('Pressure injury present — CBAHI safety protocol required');
+  if(wound==='worsening') flags.push('Wound worsening — urgent wound care referral (Saudi MOH)');
+  if(nutrition==='poor'||nutrition==='at-risk') flags.push('Nutritional risk — dietitian referral per NICE NG21');
+  if(outcomes.length<3) flags.push('Fewer than 3 functional outcomes achieved — review goals (CSP AGILE)');
+  if(!outcomes.includes('Caregiver trained')&&outcomes.length>4) flags.push('Caregiver not yet trained — required per APTA 3rd edition');
+
+  // 8. RECOMMENDATION
+  let recommendation='';
+  if(status==='Improving'&&overall>=80) recommendation='Patient on strong recovery trajectory. Review discharge criteria per CG021 — consider transition to maintenance HEP if functional goals are met.';
+  else if(status==='Improving') recommendation='Good progress. Advance functional goals per APTA protocol and update SMART objectives. Ensure 30-day plan review is documented per CMS Ch.7.';
+  else if(status==='Plateau'&&docChecks<4) recommendation='Progress plateau may be linked to documentation gaps. Complete all CMS/CG021 mandatory elements. Reassess SMART goals and consider increasing HEP frequency.';
+  else if(status==='Plateau') recommendation='Progress plateauing. Reassess plan of care per CMS 30-day review requirement. Consider adjusting intervention intensity or involving multidisciplinary team per CBAHI standards.';
+  else if(nutrition==='poor'||nutrition==='at-risk') recommendation='Declining scores with nutritional risk — urgent dietitian referral mandatory (Saudi MOH HHC Guidelines 2024, NICE NG21). Consider suspending intensive PT until nutritionally stabilised.';
+  else recommendation='Declining trajectory. Urgent plan of care review required. Escalate to supervisor and consider MDT referral per CBAHI standards. Document all findings per CMS Ch.7.';
+
+  return{functional:functionalScore,quality:careQualityScore,doc:docScore,woundNutrition:wnScore,overall,status,flags,recommendation};
+}
+
+// ══════════════════════════════════════════════
+// SCREENING ELIGIBILITY ENGINE
+// Saudi MOH HHC 2024 + CMS Ch.7 + CG021
+// ══════════════════════════════════════════════
+function calcEligibility(hb,clinMet,risks,exclusions){
+  // Absolute exclusions = immediately ineligible
+  if(exclusions.length>0){
+    const reason=exclusions.includes('not-homebound')?'Patient is not homebound — primary CMS Ch.7 requirement not met.':exclusions.includes('no-improvement')?'No improvement expected — violates CG021 rehabilitation potential criterion.':exclusions.includes('max-potential')?'Maximum rehabilitation potential reached — CG021 exclusion criterion met.':exclusions.includes('refusal')?'Patient refuses treatment — cannot proceed per CBAHI patient rights standards.':'Active exclusion criterion present per CG021 guidelines.';
+    return{eligibility:'Ineligible',riskCategory:'–',eligibilityScore:0,riskScore:100,rationale:'INELIGIBLE: '+reason+' (CG021 absolute exclusion)',gaps:['Exclusion criterion present: '+exclusions.join(', ')],conditions:[],nextAction:'Do not admit. Document exclusion reason. Refer back to physician.'};
+  }
+
+  // Homebound check (Saudi MOH / CMS) — need at least 1
+  const homeboundMet=hb.length>=1;
+
+  // Mandatory clinical criteria (CG021) — need all 6
+  const clinScore=(clinMet/6)*100;
+  const allClinMet=clinMet===6;
+
+  // Eligibility score calculation
+  const hbScore=Math.min(hb.length/2,1)*40; // max 40 pts
+  const clinPts=(clinMet/6)*50;              // max 50 pts
+  const baseScore=Math.round(hbScore+clinPts);
+  const eligibilityScore=clamp(baseScore,0,100);
+
+  // Risk score
+  const riskScore=clamp(risks.length*12,0,100);
+  const riskCategory=riskScore>=70?'Critical':riskScore>=45?'High':riskScore>=20?'Moderate':'Low';
+
+  // Decision
+  const gaps=[];
+  if(!homeboundMet) gaps.push('No homebound criterion confirmed — required by Saudi MOH & CMS Ch.7');
+  if(clinMet<6) gaps.push(`Only ${clinMet}/6 mandatory CG021 clinical criteria met`);
+  if(clinMet<4) gaps.push('Insufficient clinical criteria — minimum 4 required for Conditional admission');
+
+  let eligibility, conditions=[], rationale='', nextAction='';
+
+  if(!homeboundMet||clinMet<4){
+    eligibility='Ineligible';
+    rationale='Insufficient criteria for home care admission. '+(!homeboundMet?'Homebound status not confirmed (Saudi MOH HHC 2024, CMS Ch.7). ':'')+(clinMet<4?`Only ${clinMet}/6 mandatory CG021 criteria met. `:'')+' Minimum requirements not met.';
+    nextAction='Do not admit. Reassess homebound status and clinical necessity. Refer for outpatient physiotherapy if appropriate.';
+  } else if(!allClinMet||riskScore>=45){
+    eligibility='Conditional';
+    if(!allClinMet) conditions.push(`Complete remaining ${6-clinMet} mandatory CG021 criteria before first visit`);
+    if(risks.includes('wound')) conditions.push('Wound care plan must be established before PT commences');
+    if(risks.includes('nutrition')) conditions.push('Nutritional review and dietitian referral required (NICE NG21)');
+    if(risks.includes('cardiac')) conditions.push('Cardiac clearance letter required from physician');
+    if(risks.includes('respiratory')) conditions.push('Pulmonology clearance required before PT session');
+    rationale=`Conditional admission. Homebound status confirmed (${hb.length} criterion/criteria). Clinical criteria ${clinMet}/6 met. ${riskScore>=45?'High risk factors require management before full admission commencement.':'All clinical criteria met but risk factors require monitoring.'}`;
+    nextAction='Obtain specialist clearance for flagged conditions. Complete missing CG021 documentation. Re-assess before first session.';
+  } else {
+    eligibility='Eligible';
+    rationale=`Fully eligible for home care physiotherapy. Homebound status confirmed (${hb.length} criterion/criteria met — Saudi MOH 2024). All 6 CG021 mandatory criteria confirmed. ${riskScore>0?'Risk factors identified require monitoring throughout treatment.':'Low risk profile.'}`;
+    nextAction='Schedule initial PT assessment within 48 hours per Saudi MOH standards. Implement risk-specific protocols as required.';
+  }
+
+  return{eligibility,riskCategory,eligibilityScore,riskScore,rationale,gaps,conditions,nextAction};
+}
+
+// ══════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════
+function renderDashboard(){
+  const names=[...new Set(visits.map(v=>v.name))];
+  const allScores=names.map(n=>{const pv=getVisitsFor(n);return pv.length?(pv[pv.length-1].scores?.overall||0):0;});
+  const avgScore=names.length?Math.round(allScores.reduce((a,b)=>a+b,0)/names.length):0;
+  const improving=allScores.filter(s=>s>=75).length;
+  const needReview=allScores.filter(s=>s<50).length;
+  const thisMonthIntake=[...new Set(visits.filter(v=>monthKey(v.date)===monthKey(today())).map(v=>v.name))].length;
+
+  document.getElementById('dash-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Patients tracked</div><div class="metric-value">${names.length}</div><div class="metric-sub">active</div></div>
+    <div class="metric"><div class="metric-label">Avg recovery index</div><div class="metric-value ${scClass(avgScore)}">${avgScore||'–'}${avgScore?'%':''}</div><div class="metric-sub">program-wide</div></div>
+    <div class="metric"><div class="metric-label">Improving ≥75%</div><div class="metric-value mv-green">${improving}</div><div class="metric-sub">of ${names.length}</div></div>
+    <div class="metric"><div class="metric-label">Need review <50%</div><div class="metric-value ${needReview?'mv-amber':'mv-green'}">${needReview}</div><div class="metric-sub">critical</div></div>
+    <div class="metric"><div class="metric-label">Total visits</div><div class="metric-value">${visits.length}</div><div class="metric-sub">recorded</div></div>
+    <div class="metric"><div class="metric-label">Waitlist</div><div class="metric-value ${waitlist.length?'mv-amber':'mv-green'}">${waitlist.length}</div><div class="metric-sub">pending</div></div>
+    <div class="metric"><div class="metric-label">This month intake</div><div class="metric-value ${thisMonthIntake>=(settings.maxMonthlyIntake||6)?'mv-red':'mv-green'}">${thisMonthIntake}</div><div class="metric-sub">of ${settings.maxMonthlyIntake||6} max</div></div>
+  `;
+
+  // ── Home Care Quality Indicators (HCQI) ──
+  // Based on: Saudi MOH HHC 2024, CBAHI, CMS Ch.7, APTA, NICE NG21
+  const hcqiEl = document.getElementById('dash-hcqi');
+  if(hcqiEl){
+    // 1. Care plan review compliance — CMS Ch.7 (30-day review)
+    const reviewDue = names.filter(n=>{ const pv=getVisitsFor(n); return pv.length && daysSince(pv[pv.length-1].date)>28; }).length;
+    const reviewRate = names.length ? clamp(Math.round((1 - reviewDue/Math.max(names.length,1))*100),0,100) : 100;
+
+    // 2. Documentation completeness — CG021 / CMS Ch.7
+    const docScores = visits.map(v=>v.scores?.doc||0);
+    const avgDoc = docScores.length ? Math.round(docScores.reduce((a,b)=>a+b,0)/docScores.length) : 0;
+
+    // 3. HEP delivery rate — APTA 3rd ed.
+    const hepVisits = visits.filter(v=>{
+      const checks = v.docChecks||[];
+      return checks.includes('doc-3') || checks.includes('doc3') || (v.hep && parseInt(v.hep)>=5);
+    }).length;
+    const hepRate = visits.length ? clamp(Math.round(hepVisits/visits.length*100),0,100) : 0;
+
+    // 4. Caregiver training rate — APTA / Saudi MOH
+    const caregiverVisits = visits.filter(v=>(v.outcomes||[]).includes('Caregiver trained')).length;
+    const caregiverRate = visits.length ? clamp(Math.round(caregiverVisits/visits.length*100),0,100) : 0;
+
+    // 5. Wound & nutrition at-risk rate — NICE NG21
+    const atRiskVisits = visits.filter(v=> v.wound && v.wound!=='none' || v.nutrition && v.nutrition!=='adequate').length;
+    const atRiskRate = visits.length ? clamp(Math.round(atRiskVisits/visits.length*100),0,100) : 0;
+
+    // 6. Admission screening coverage — CBAHI
+    const screenedNames = new Set(screened.map(s=>s.name));
+    const screenRate = names.length ? clamp(Math.round([...names].filter(n=>screenedNames.has(n)).length/names.length*100),0,100) : 0;
+
+    // 7. Safety — patients who felt safe (from surveys)
+    const safeSurveys = surveys.filter(s=>s.answers?.safe===1).length;
+    const safeRate = surveys.length ? clamp(Math.round(safeSurveys/surveys.length*100),0,100) : null;
+
+    // 8. Provider visit compliance — are visits happening on schedule?
+    const activeWithVisits = names.filter(n=>getVisitsFor(n).length>0).length;
+    const visitCompliance = names.length ? clamp(Math.round(activeWithVisits/names.length*100),0,100) : 0;
+
+    const indicator=(label, sublabel, value, suffix, target, color)=>{
+      const pct = suffix==='%' ? value : null;
+      const barW = pct!==null ? pct : clamp(Math.round((value/target)*100),0,100);
+      const cls = value===null?'var(--text3)': value>=target?color==='green'?'var(--green)':'var(--blue)': value>=target*0.7?'var(--amber)':'var(--red)';
+      return `<div style="margin-bottom:11px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
+          <div>
+            <span style="font-size:11px;font-weight:500;color:var(--text);">${label}</span>
+            <span style="font-size:9px;color:var(--text3);margin-left:5px;font-family:var(--mono);">${sublabel}</span>
+          </div>
+          <span style="font-size:12px;font-weight:700;font-family:var(--mono);color:${cls};">${value!==null?value+suffix:'–'}</span>
+        </div>
+        <div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;position:relative;">
+          <div style="height:100%;width:${barW}%;background:${cls};border-radius:99px;transition:width .6s ease;"></div>
+          <div style="position:absolute;top:0;height:100%;width:2px;background:rgba(0,0,0,0.15);left:${target}%;"></div>
+        </div>
+      </div>`;
+    };
+
+    hcqiEl.innerHTML =
+      indicator('30-day plan review compliance','CMS Ch.7 · Saudi MOH', reviewRate,'%',90,'green') +
+      indicator('Documentation completeness','CG021 · CMS Ch.7', avgDoc,'%',80,'green') +
+      indicator('HEP delivery rate','APTA 3rd ed.', hepRate,'%',85,'green') +
+      indicator('Caregiver training coverage','APTA · Saudi MOH', caregiverRate,'%',70,'blue') +
+      indicator('Admission screening coverage','CBAHI · Saudi MOH', screenRate,'%',100,'green') +
+      indicator('Wound / nutrition at-risk cases','NICE NG21', atRiskRate,'%',30,'green') +
+      (safeRate!==null ? indicator('Patient safety perception','CBAHI · HHCAHPS', safeRate,'%',90,'green') : '') +
+      `<div class="ref" style="margin-top:4px;">Benchmarks: Saudi MOH HHC 2024 · CBAHI · CMS Ch.7 · CG021 · APTA 3rd ed. · NICE NG21</div>`;
+  }
+
+  // Recent patients
+  const dp=document.getElementById('dash-patients');
+  const recent=[...visits].reverse().slice(0,6);
+  dp.innerHTML=recent.length?recent.map(v=>`<div class="pt-row"><div class="avatar" style="width:28px;height:28px;font-size:10px;background:var(--blue-bg);color:var(--blue-text);">${initials(v.name)}</div><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.name}</div><div style="font-size:10px;color:var(--text2);">${v.diagnosis} · ${v.date}</div></div><span class="badge ${badgeCls(v.scores?.overall||0)}">${v.scores?.overall||0}%</span></div>`).join(''):'<div class="empty">No visits yet.<br>Add your first visit to begin.</div>';
+
+  // Alerts
+  const alertPts=names.filter(n=>{const pv=getVisitsFor(n);return pv.length&&(pv[pv.length-1].scores?.overall||0)<55;});
+  const overduePts=names.filter(n=>{const pv=getVisitsFor(n);return pv.length&&daysSince(pv[pv.length-1].date)>30;});
+  const noScreenPts=names.filter(n=>!screened.find(s=>s.name===n));
+  const al=document.getElementById('dash-alerts');
+  const alertItems=[
+    ...alertPts.map(n=>{const pv=getVisitsFor(n);const l=pv[pv.length-1];return{name:n,sc:l.scores?.overall||0,msg:`Recovery score critical (${l.scores?.overall||0}%) — urgent plan review`,type:'red'};}),
+    ...overduePts.filter(n=>!alertPts.includes(n)).map(n=>{const pv=getVisitsFor(n);const l=pv[pv.length-1];return{name:n,sc:l.scores?.overall||0,msg:`No visit in ${daysSince(l.date)} days — 30-day CMS review overdue`,type:'amber'};}),
+    ...noScreenPts.slice(0,3).map(n=>({name:n,sc:null,msg:'No admission screening on file — CBAHI requirement',type:'amber'})),
+  ];
+  al.innerHTML=alertItems.length?alertItems.slice(0,8).map(a=>`<div class="pt-row"><div class="avatar" style="width:28px;height:28px;font-size:10px;background:var(--${a.type}-bg);color:var(--${a.type}-text);">${initials(a.name)}</div><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;">${a.name}</div><div style="font-size:10px;color:var(--text2);">${a.msg}</div></div>${a.sc!==null?`<span class="badge ${badgeCls(a.sc)}">${a.sc}%</span>`:''}</div>`).join(''):'<div class="empty" style="padding:1rem;">No alerts — all cases on track ✓</div>';
+}
+
+// ══════════════════════════════════════════════
+// SCREENING
+// ══════════════════════════════════════════════
+function runScreening(){
+  const name=document.getElementById('sc-name').value.trim();
+  if(!name){alert('Enter patient name.');return;}
+  const hb=[...document.querySelectorAll('input[name="hb"]:checked')].map(c=>c.value);
+  const risk=[...document.querySelectorAll('input[name="risk"]:checked')].map(c=>c.value);
+  const exclusions=[...document.querySelectorAll('input[name="excl"]:checked')].map(c=>c.value);
+  const clinMet=['cl-1','cl-2','cl-3','cl-4','cl-5','cl-6'].filter(id=>document.getElementById(id)?.checked).length;
+  const result=calcEligibility(hb,clinMet,risk,exclusions);
+  const dob=document.getElementById('sc-dob').value;
+  const age=dob?Math.floor((new Date()-new Date(dob))/(365.25*24*3600*1000)):null;
+
+  // Save
+  const rec={name,age,diagnosis:document.getElementById('sc-dx').value,physician:document.getElementById('sc-physician').value,provider:document.getElementById('sc-provider').value,date:today(),result};
+  screened.push(rec);
+  save(KEYS.screened,screened);
+
+  // Render
+  const cls=result.eligibility==='Eligible'?'eligible':result.eligibility==='Ineligible'?'ineligible':'conditional';
+  const icon=result.eligibility==='Eligible'?'✓':result.eligibility==='Ineligible'?'✕':'!';
+  document.getElementById('sc-result').innerHTML=`
+    <div class="result-box ${cls}" style="margin-top:12px;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px;">${icon} ${result.eligibility} — ${name}</div>
+      <div style="display:flex;gap:16px;margin-bottom:10px;flex-wrap:wrap;">
+        <div><div style="font-size:9px;font-family:var(--mono);color:var(--text2);">ELIGIBILITY SCORE</div><div style="font-size:22px;font-weight:700;">${result.eligibilityScore}%</div></div>
+        <div><div style="font-size:9px;font-family:var(--mono);color:var(--text2);">RISK CATEGORY</div><div style="font-size:22px;font-weight:700;">${result.riskCategory}</div></div>
+        <div><div style="font-size:9px;font-family:var(--mono);color:var(--text2);">HOMEBOUND CRITERIA</div><div style="font-size:22px;font-weight:700;">${hb.length}/6</div></div>
+        <div><div style="font-size:9px;font-family:var(--mono);color:var(--text2);">CLINICAL CRITERIA</div><div style="font-size:22px;font-weight:700;">${clinMet}/6</div></div>
+      </div>
+      <div style="font-size:12px;margin-bottom:8px;">${result.rationale}</div>
+      ${result.gaps.length?`<div style="font-size:11px;margin-bottom:6px;"><b>Gaps:</b> ${result.gaps.join(' · ')}</div>`:''}
+      ${result.conditions.length?`<div style="font-size:11px;margin-bottom:6px;"><b>Conditions:</b><ul style="margin:4px 0 0 14px;">${result.conditions.map(c=>`<li>${c}</li>`).join('')}</ul></div>`:''}
+      <div style="font-size:11px;font-weight:600;">→ Next action: ${result.nextAction}</div>
+    </div>
+    <div class="ref">Saudi MOH HHC Guidelines 2024 · CBAHI Standards · CMS Medicare Ch.7 · CG021 PT/OT · APTA 3rd ed. · CSP AGILE 2013</div>`;
+  renderScHistory();
+}
+
+function clearScreening(){
+  document.querySelectorAll('#page-screening input[type=checkbox]').forEach(c=>c.checked=false);
+  ['sc-name','sc-dob','sc-dx','sc-physician','sc-comorbid'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sc-result').innerHTML='';
+}
+
+function renderScHistory(){
+  const el=document.getElementById('sc-history');
+  if(!el) return;
+  if(!screened.length){el.innerHTML='<div class="empty">No patients screened yet.</div>';return;}
+  el.innerHTML=`<table class="tbl"><thead><tr><th>Patient</th><th>Diagnosis</th><th>Date</th><th>Eligibility</th><th>Risk</th><th>Score</th></tr></thead><tbody>`+
+    [...screened].reverse().slice(0,15).map(s=>`<tr><td style="font-weight:500;">${s.name}${s.age?' ('+s.age+'y)':''}</td><td style="color:var(--text2);">${s.diagnosis||'–'}</td><td style="font-family:var(--mono);font-size:10px;">${s.date}</td><td><span class="badge ${s.result?.eligibility==='Eligible'?'b-green':s.result?.eligibility==='Ineligible'?'b-red':'b-amber'}">${s.result?.eligibility||'–'}</span></td><td>${s.result?.riskCategory||'–'}</td><td style="font-weight:700;font-family:var(--mono);">${s.result?.eligibilityScore||0}%</td></tr>`).join('')+
+    `</tbody></table>`;
+}
+
+// ══════════════════════════════════════════════
+// VISITS
+// ══════════════════════════════════════════════
+function calcAndPreview(){
+  const name=document.getElementById('v-name').value.trim();
+  if(!name){alert('Enter patient name first.');return;}
+  const outcomes=[...document.querySelectorAll('#v-outcomes input:checked')].map(c=>c.value);
+  const docChecks=['doc-1','doc-2','doc-3','doc-4','doc-5','doc-6'].filter(id=>document.getElementById(id)?.checked).length;
+  const hep=document.getElementById('v-hep').value;
+  const engagement=document.getElementById('v-eng').value;
+  const wound=document.getElementById('v-wound').value;
+  const nutrition=document.getElementById('v-nutrition').value;
+  const scores=calcVisitScores({outcomes,docChecks,hep,engagement,wound,nutrition});
+  lastScores=scores;
+
+  const clsMap={Improving:'improving',Plateau:'plateau',Declining:'declining'};
+  const colorMap={Improving:'var(--green)',Plateau:'var(--amber)',Declining:'var(--red)'};
+  const bars=[['Functional improvement',scores.functional,'#1A8C62'],['Care quality',scores.quality,'#2A72B8'],['Documentation completeness',scores.doc,'#B87210'],['Wound & nutrition',scores.woundNutrition,'#C94040'],['Overall recovery index',scores.overall,'#6B5FCC']];
+
+  document.getElementById('v-result').innerHTML=`
+    <div class="result-box ${clsMap[scores.status]}" style="margin-top:12px;">
+      <div style="font-size:15px;font-weight:700;color:${colorMap[scores.status]};margin-bottom:10px;">
+        ${scores.status==='Improving'?'↑':scores.status==='Declining'?'↓':'→'} ${scores.status} — ${scores.overall}% overall
+      </div>
+      <div style="margin-bottom:12px;">
+        ${bars.map(([l,v,c])=>`<div class="score-section"><div class="score-lbl-row"><span class="lbl">${l}</span><span class="val" style="color:${c};">${v}%</span></div><div class="score-bar"><div class="score-fill" style="width:${v}%;background:${c};"></div></div></div>`).join('')}
+      </div>
+      ${scores.flags.length?`<div style="margin-bottom:8px;">${scores.flags.map(f=>`<div class="flag-row"><span class="flag-icon" style="color:var(--amber);">!</span>${f}</div>`).join('')}</div>`:''}
+      <div style="font-size:12px;font-style:italic;padding-top:6px;border-top:1px solid rgba(0,0,0,0.08);">${scores.recommendation}</div>
+    </div>
+    <div class="ref">Scoring per: Saudi MOH HHC 2024 · CBAHI · NICE NG21 · CMS Ch.7 · CG021 · APTA 3rd ed. · CSP AGILE 2013</div>`;
+}
+
+function saveVisit(){
+  const name=document.getElementById('v-name').value.trim();
+  const date=document.getElementById('v-date').value;
+  if(!name||!date){alert('Enter patient name and date.');return;}
+  if(!lastScores){alert('Click "Calculate scores" first.');return;}
+  const outcomes=[...document.querySelectorAll('#v-outcomes input:checked')].map(c=>c.value);
+  const docChecks=['doc-1','doc-2','doc-3','doc-4','doc-5','doc-6'].filter(id=>document.getElementById(id)?.checked);
+  visits.push({name,date,provider:document.getElementById('v-provider').value,diagnosis:document.getElementById('v-diagnosis').value,wound:document.getElementById('v-wound').value,nutrition:document.getElementById('v-nutrition').value,outcomes,docChecks,hep:document.getElementById('v-hep').value,engagement:document.getElementById('v-eng').value,providerNote:document.getElementById('v-note').value.trim(),supervisorComment:document.getElementById('v-comment').value.trim(),scores:{functional:lastScores.functional,quality:lastScores.quality,doc:lastScores.doc,woundNutrition:lastScores.woundNutrition,overall:lastScores.overall},aiStatus:lastScores.status,aiRecommendation:lastScores.recommendation,savedAt:new Date().toISOString()});
+  save(KEYS.visits,visits);
+  alert(`✓ Visit saved for ${name}. Total visits: ${visits.length}`);
+  lastScores=null;
+  clearVisitForm();
+  populateDatalist();
+  renderDashboard();
+}
+
+function clearVisitForm(){
+  document.getElementById('v-name').value='';
+  document.getElementById('v-note').value='';
+  document.getElementById('v-comment').value='';
+  document.getElementById('v-result').innerHTML='';
+  document.querySelectorAll('#page-visits input[type=checkbox]').forEach(c=>c.checked=false);
+  document.getElementById('v-hep').value=7;document.getElementById('v-hep-val').textContent=7;
+  document.getElementById('v-eng').value=8;document.getElementById('v-eng-val').textContent=8;
+  document.getElementById('v-date').value=today();
+  lastScores=null;
+}
+
+function populateDatalist(){
+  const dl=document.getElementById('v-pt-list');
+  if(dl) dl.innerHTML=[...new Set(visits.map(v=>v.name))].map(n=>`<option value="${n}">`).join('');
+}
+
+// ══════════════════════════════════════════════
+// LONGITUDINAL
+// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// LONGITUDINAL — HORIZONTAL LAYERED VIEWS
+// ══════════════════════════════════════════════
+let longView='swimlane', longDim='overall';
+
+function setLongView(v,el){
+  longView=v;
+  document.querySelectorAll('.long-view-btn').forEach(b=>b.classList.remove('active-view'));
+  if(el) el.classList.add('active-view');
+  renderLongitudinal();
+}
+function setLongDim(d,el){
+  longDim=d;
+  document.querySelectorAll('.long-dim-btn').forEach(b=>b.classList.remove('active-dim'));
+  if(el) el.classList.add('active-dim');
+  renderLongitudinal();
+}
+
+function renderLongitudinal(){
+  const names=[...new Set(visits.map(v=>v.name))];
+  const el=document.getElementById('long-main');
+  if(!names.length){el.innerHTML='<div class="empty" style="padding:2rem;">No visits recorded yet. Add visits to begin tracking.</div>';return;}
+  if(longView==='swimlane') renderSwimlane(names,el);
+  else if(longView==='heatmap') renderHeatmap(names,el);
+  else if(longView==='layers') renderLayers(names,el);
+  else if(longView==='timeline') renderVTimeline(names,el);
+}
+
+// ── COLOUR HELPERS ──
+function scoreToColor(s,alpha){
+  if(s===null||s===undefined) return alpha?`rgba(220,218,214,${alpha})`:'#DCDAD6';
+  if(s>=75) return alpha?`rgba(26,140,98,${alpha})`:'#1A8C62';
+  if(s>=50) return alpha?`rgba(184,114,16,${alpha})`:'#B87210';
+  return alpha?`rgba(201,64,64,${alpha})`:'#C94040';
+}
+function scoreToLabel(s){
+  if(s===null||s===undefined) return '–';
+  return s+'%';
+}
+function getDimLabel(d){
+  return{overall:'Overall recovery',functional:'Functional',doc:'Documentation',woundNutrition:'Wound & Nutrition'}[d]||d;
+}
+
+// ── 1. SWIMLANE ──
+function renderSwimlane(names,el){
+  // Build unified date axis — all visit dates across all patients sorted
+  const allDates=[...new Set(visits.map(v=>v.date))].sort();
+  if(!allDates.length){el.innerHTML='<div class="empty" style="padding:2rem;">No visits yet.</div>';return;}
+
+  // Group by month for header
+  const monthKeys=[...new Set(allDates.map(d=>d.slice(0,7)))];
+  const colWidth=Math.max(36, Math.floor(560/allDates.length));
+
+  let html=`<div class="swimlane-wrap">`;
+  // Date header
+  html+=`<div style="display:flex;padding-left:140px;margin-bottom:6px;">`;
+  allDates.forEach(d=>{
+    const short=d.slice(5); // MM-DD
+    html+=`<div style="min-width:${colWidth}px;width:${colWidth}px;font-size:8px;font-family:var(--mono);color:var(--text3);text-align:center;padding:0 1px;overflow:hidden;text-overflow:ellipsis;">${short}</div>`;
+  });
+  html+=`</div>`;
+
+  // One row per patient
+  names.forEach(name=>{
+    const pv=getVisitsFor(name);
+    const byDate={};
+    pv.forEach(v=>byDate[v.date]=v);
+    const latest=pv[pv.length-1];
+    const sc=latest?.scores?.[longDim]||0;
+    html+=`<div class="swimlane-row">
+      <div class="swimlane-label" onclick="showLongDetail('${name}')">
+        ${name.split(' ')[0]} ${name.split(' ').slice(1).join(' ')}
+        <small>${latest?.diagnosis?.split('—')[0]||'–'} · ${pv.length}v</small>
+      </div>
+      <div class="swimlane-cells">`;
+
+    allDates.forEach(d=>{
+      const v=byDate[d];
+      if(v){
+        const s=v.scores?.[longDim]||0;
+        const bg=scoreToColor(s);
+        const txtColor=s>=50?'#fff':'#fff';
+        html+=`<div class="swim-cell" style="min-width:${colWidth}px;width:${colWidth}px;background:${bg};" onclick="showLongDetail('${name}')" title="${name} · ${d} · ${getDimLabel(longDim)}: ${s}%">${s}</div>`;
+      } else {
+        html+=`<div class="swim-cell empty" style="min-width:${colWidth}px;width:${colWidth}px;" title="No visit on ${d}">·</div>`;
+      }
+    });
+    html+=`</div></div>`;
+  });
+
+  // Month separators label row
+  html+=`<div style="display:flex;padding-left:140px;margin-top:6px;border-top:1px solid var(--border);padding-top:5px;">`;
+  monthKeys.forEach(mk=>{
+    const cnt=allDates.filter(d=>d.startsWith(mk)).length;
+    const d=new Date(mk+'-01');
+    const lbl=d.toLocaleDateString('en',{month:'short',year:'2-digit'});
+    html+=`<div style="min-width:${colWidth*cnt}px;font-size:9px;font-family:var(--mono);color:var(--text3);">${lbl}</div>`;
+  });
+  html+=`</div>`;
+
+  html+=`<div class="ref" style="margin-top:10px;">Each cell = one visit · Color = ${getDimLabel(longDim)} score · Click patient name to view detail</div>`;
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
+// ── 2. HEAT MAP ──
+function renderHeatmap(names,el){
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({label:d.toLocaleDateString('en',{month:'short',year:'2-digit'}),key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`});}
+
+  const cols=months.length+1; // +1 for row label
+  let html=`<div class="heatmap-wrap">`;
+
+  // Header
+  html+=`<div style="display:grid;grid-template-columns:140px repeat(${months.length},1fr);gap:3px;margin-bottom:3px;">`;
+  html+=`<div></div>`;
+  months.forEach(m=>{ html+=`<div style="font-size:9px;font-family:var(--mono);color:var(--text3);text-align:center;">${m.label}</div>`; });
+  html+=`</div>`;
+
+  // Score rows
+  names.forEach(name=>{
+    const pv=getVisitsFor(name);
+    html+=`<div style="display:grid;grid-template-columns:140px repeat(${months.length},1fr);gap:3px;margin-bottom:3px;">`;
+    html+=`<div style="font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;padding-right:8px;cursor:pointer;color:var(--text);" onclick="showLongDetail('${name}')">${name.split(' ')[0]} ${name.split(' ')[1]||''}</div>`;
+    months.forEach(m=>{
+      const mv=pv.filter(v=>v.date?.startsWith(m.key));
+      if(!mv.length){
+        html+=`<div class="hm-cell hm-empty" title="No visits in ${m.label}">–</div>`;
+      } else {
+        const avg=Math.round(mv.reduce((a,v)=>a+(v.scores?.[longDim]||0),0)/mv.length);
+        const bg=scoreToColor(avg);
+        // Intensity varies within color family
+        const intensity=Math.round(40+avg*0.6);
+        html+=`<div class="hm-cell" style="background:${bg};opacity:${0.4+avg/100*0.6};" onclick="showLongDetail('${name}')" title="${name} · ${m.label} · avg ${getDimLabel(longDim)}: ${avg}%">${avg}%</div>`;
+      }
+    });
+    html+=`</div>`;
+  });
+
+  // Gradient scale
+  html+=`<div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-left:140px;">`;
+  html+=`<span style="font-size:9px;font-family:var(--mono);color:var(--text3);">0%</span>`;
+  html+=`<div style="flex:1;height:6px;border-radius:99px;background:linear-gradient(to right,#C94040,#B87210,#1A8C62);"></div>`;
+  html+=`<span style="font-size:9px;font-family:var(--mono);color:var(--text3);">100%</span>`;
+  html+=`</div>`;
+  html+=`<div class="ref">Each cell = avg ${getDimLabel(longDim)} score for that month · Click to view patient detail</div>`;
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
+// ── 3. SCORE LAYERS ──
+function renderLayers(names,el){
+  // 4 dimensions stacked as horizontal bar layers, all patients side by side
+  const dims=[
+    {key:'overall',label:'Overall recovery',color:'#6B5FCC'},
+    {key:'functional',label:'Functional',color:'#1A8C62'},
+    {key:'doc',label:'Documentation',color:'#2A72B8'},
+    {key:'woundNutrition',label:'Wound & Nutrition',color:'#C94040'},
+  ];
+
+  let html=`<div class="layers-wrap">`;
+
+  // Patient name header
+  html+=`<div style="display:flex;padding-left:110px;margin-bottom:4px;gap:4px;">`;
+  names.forEach(name=>{
+    html+=`<div style="flex:1;min-width:0;font-size:9px;font-family:var(--mono);color:var(--text2);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;" onclick="showLongDetail('${name}')">${name.split(' ')[0]}</div>`;
+  });
+  html+=`</div>`;
+
+  // One horizontal layer per dimension
+  dims.forEach(dim=>{
+    html+=`<div style="margin-bottom:14px;">`;
+    html+=`<div style="font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-family:var(--mono);color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${dim.color};flex-shrink:0;"></span>${dim.label}</div>`;
+    html+=`<div style="display:flex;gap:4px;padding-left:110px;">`;
+    names.forEach(name=>{
+      const pv=getVisitsFor(name);
+      const latest=pv[pv.length-1];
+      const s=latest?.scores?.[dim.key]||0;
+      const bg=scoreToColor(s);
+      const prev=pv.length>=2?pv[pv.length-2].scores?.[dim.key]||0:null;
+      const delta=prev!==null?s-prev:null;
+      html+=`<div style="flex:1;min-width:0;" onclick="showLongDetail('${name}')">
+        <div style="height:44px;background:${bg};border-radius:4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'" title="${name} · ${dim.label}: ${s}%">
+          <span style="font-size:12px;font-weight:700;font-family:var(--mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.25);">${s}%</span>
+          ${delta!==null?`<span style="font-size:8px;color:rgba(255,255,255,0.8);">${delta>=0?'▲':'▼'}${Math.abs(delta)}</span>`:''}
+        </div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+
+  // Bottom: name footer
+  html+=`<div style="display:flex;gap:4px;padding-left:110px;border-top:1px solid var(--border);padding-top:6px;margin-top:4px;">`;
+  names.forEach(name=>{
+    const pv=getVisitsFor(name);
+    const sc=pv.length?pv[pv.length-1].scores?.overall||0:0;
+    html+=`<div style="flex:1;min-width:0;text-align:center;cursor:pointer;" onclick="showLongDetail('${name}')">
+      <div style="font-size:9px;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);">${name.split(' ')[0]}</div>
+      <div style="font-size:9px;font-family:var(--mono);font-weight:700;color:${scoreToColor(sc)};">${sc}%</div>
+    </div>`;
+  });
+  html+=`</div>`;
+
+  html+=`<div class="ref">Each bar = latest ${getDimLabel(longDim)} score per patient · △ = change from previous visit · Click bar to view detail</div>`;
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
+// ── 4. VISIT TIMELINE ──
+function renderVTimeline(names,el){
+  // Build 6-month week axis
+  const weeks=[];
+  const start=new Date(); start.setMonth(start.getMonth()-5); start.setDate(1);
+  const end=new Date();
+  for(let d=new Date(start);d<=end;){
+    weeks.push(d.toISOString().split('T')[0]);
+    d.setDate(d.getDate()+7);
+  }
+  const totalDays=(end-start)/(1000*3600*24);
+
+  let html=`<div class="vtl-wrap">`;
+
+  // Month axis labels
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({label:d.toLocaleDateString('en',{month:'short'}),key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`});}
+  html+=`<div style="display:flex;padding-left:140px;margin-bottom:8px;">`;
+  months.forEach(m=>{html+=`<div style="flex:1;font-size:9px;font-family:var(--mono);color:var(--text3);">${m.label}</div>`;});
+  html+=`</div>`;
+
+  names.forEach(name=>{
+    const pv=getVisitsFor(name).filter(v=>v.date>=start.toISOString().split('T')[0]);
+    const latest=pv[pv.length-1];
+    html+=`<div class="vtl-track">`;
+    html+=`<div class="vtl-name" onclick="showLongDetail('${name}')">
+      ${name.split(' ')[0]} ${name.split(' ')[1]||''}
+      <small>${pv.length} visit${pv.length!==1?'s':''}</small>
+    </div>`;
+    html+=`<div class="vtl-line">`;
+    html+=`<div class="vtl-spine"></div>`;
+
+    pv.forEach(v=>{
+      const vDate=new Date(v.date);
+      const daysFromStart=(vDate-start)/(1000*3600*24);
+      const pct=clamp(Math.round((daysFromStart/totalDays)*100),0,100);
+      const s=v.scores?.[longDim]||0;
+      const bg=scoreToColor(s);
+      const isLatest=v===latest;
+      html+=`<div class="vtl-dot${s===0?' no-visit':''}" style="left:${pct}%;background:${bg};${isLatest?'box-shadow:0 0 0 2px #fff,0 0 0 3px '+bg+';width:24px;height:24px;':''}" onclick="showLongDetail('${name}')" title="${name} · ${v.date} · ${getDimLabel(longDim)}: ${s}%">${s<10?s:s}</div>`;
+    });
+
+    html+=`</div></div>`;
+  });
+
+  html+=`<div class="ref" style="margin-top:10px;">Each dot = one visit · Size highlights latest · Color = ${getDimLabel(longDim)} score · Last 6 months shown · Click to view detail</div>`;
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
+// ── DETAIL PANEL ──
+function showLongDetail(name){
+  const pv=getVisitsFor(name);
+  const detailEl=document.getElementById('long-detail');
+  const titleEl=document.getElementById('long-detail-title');
+  const bodyEl=document.getElementById('long-detail-body');
+  if(!pv.length){detailEl.style.display='none';return;}
+  detailEl.style.display='block';
+  detailEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  const latest=pv[pv.length-1]; const first=pv[0];
+  const sc=latest.scores?.overall||0; const firstSc=first.scores?.overall||0;
+  const delta=sc-firstSc;
+
+  titleEl.innerHTML=`<span class="dot dot-purple"></span>${name} — ${latest.diagnosis}`;
+
+  // Score dimension chips
+  const dimChips=[
+    {key:'overall',label:'Overall',color:'#6B5FCC'},
+    {key:'functional',label:'Functional',color:'#1A8C62'},
+    {key:'doc',label:'Doc',color:'#2A72B8'},
+    {key:'woundNutrition',label:'W & N',color:'#C94040'},
+    {key:'quality',label:'Care quality',color:'#B87210'},
+  ];
+
+  bodyEl.innerHTML=`
+    <!-- Summary row -->
+    <div style="display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;">
+      <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">FIRST VISIT</div><div style="font-size:20px;font-weight:700;">${firstSc}%</div><div style="font-size:9px;color:var(--text3);">${first.date}</div></div>
+      <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">LATEST</div><div style="font-size:20px;font-weight:700;color:${scoreToColor(sc)};">${sc}%</div><div style="font-size:9px;color:var(--text3);">${latest.date}</div></div>
+      <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">CHANGE</div><div style="font-size:20px;font-weight:700;color:${delta>=0?'var(--green)':'var(--red)'};">${delta>=0?'+':''}${delta}%</div></div>
+      <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">VISITS</div><div style="font-size:20px;font-weight:700;">${pv.length}</div></div>
+      <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">STATUS</div><div style="font-size:13px;font-weight:700;color:${scoreToColor(sc)};margin-top:3px;">${scLabel(sc)}</div></div>
+    </div>
+
+    <!-- Dimension chips — latest scores -->
+    <div class="dim-strip">
+      ${dimChips.map(d=>{const s=latest.scores?.[d.key]||0;return`<div class="dim-chip" style="background:${scoreToColor(s)};"><div style="font-size:13px;">${s}%</div><small>${d.label}</small></div>`}).join('')}
+    </div>
+
+    <!-- Per-visit horizontal score bands -->
+    <div style="margin-bottom:10px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-family:var(--mono);">Visit-by-visit — all dimensions</div>
+      ${pv.map((v,i)=>{
+        const dims2=[{k:'overall',c:'#6B5FCC'},{k:'functional',c:'#1A8C62'},{k:'doc',c:'#2A72B8'},{k:'woundNutrition',c:'#C94040'},{k:'quality',c:'#B87210'}];
+        return`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <div style="width:70px;font-size:9px;font-family:var(--mono);color:var(--text3);flex-shrink:0;">${v.date.slice(5)}<br><span style="color:var(--text2);font-size:8px;">#${i+1}</span></div>
+          <div style="flex:1;display:flex;gap:2px;height:22px;">
+            ${dims2.map(d=>{const s=v.scores?.[d.k]||0;return`<div style="flex:1;background:${scoreToColor(s)};border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;font-family:var(--mono);color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.2);" title="${d.k}: ${s}%">${s}</div>`;}).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+      <div style="display:flex;gap:6px;padding-left:76px;margin-top:3px;">
+        ${[{l:'Overall',c:'#6B5FCC'},{l:'Functional',c:'#1A8C62'},{l:'Doc',c:'#2A72B8'},{l:'W&N',c:'#C94040'},{l:'Quality',c:'#B87210'}].map(d=>`<div style="flex:1;text-align:center;font-size:7px;font-family:var(--mono);color:var(--text3);">${d.l}</div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Last recommendation -->
+    ${latest.aiRecommendation?`<div style="padding:10px 12px;background:var(--bg2);border-radius:var(--radius-sm);font-size:11px;color:var(--text2);border-left:3px solid var(--purple);line-height:1.6;">${latest.aiRecommendation}</div>`:''}
+    ${latest.supervisorComment?`<div style="padding:8px 12px;background:var(--amber-bg);border-radius:var(--radius-sm);font-size:11px;color:var(--amber-text);margin-top:6px;border-left:3px solid var(--amber);">Supervisor: ${latest.supervisorComment}</div>`:''}
+    <div class="ref">Click another patient in the view above to switch · All scores calculated per Saudi MOH, CBAHI, CMS Ch.7, CG021, APTA & CSP AGILE 2013</div>`;
+}
+
+function selectLong(n){selectedLong=n;renderLongitudinal();}
+
+
+// ══════════════════════════════════════════════
+// CASES
+// ══════════════════════════════════════════════
+function buildCases(){
+  const names=[...new Set([...visits.map(v=>v.name),...screened.map(s=>s.name)])];
+  return names.map(name=>{
+    const pv=getVisitsFor(name);
+    const ps=screened.filter(s=>s.name===name);
+    const latest=pv[pv.length-1]; const latestSc=ps[ps.length-1];
+    const sc=latest?.scores?.overall||null;
+    const alerts=[];
+    if(!latestSc) alerts.push({t:'amber',m:'No admission screening — CBAHI requirement'});
+    if(sc!==null&&sc<50) alerts.push({t:'red',m:`Score critical (${sc}%) — urgent review`});
+    if(latest?.date&&daysSince(latest.date)>30) alerts.push({t:'amber',m:`No visit in ${daysSince(latest.date)}d — 30-day review overdue`});
+    if(latest?.scores?.doc<60) alerts.push({t:'amber',m:'Documentation <60% — CG021 gap'});
+    let stage='pending';
+    if(sc>=88) stage='discharge-ready';
+    else if(pv.length>=9) stage='advanced';
+    else if(pv.length>=5) stage='mid-program';
+    else if(pv.length>0) stage='early';
+    else if(latestSc) stage='screened';
+    return{name,pv,latestVisit:latest,latestScreen:latestSc,sc,alerts,stage,diagnosis:latest?.diagnosis||latestSc?.diagnosis||'–',provider:latest?.provider||'–',eligibility:latestSc?.result?.eligibility||null};
+  });
+}
+
+function renderCases(){
+  const cases=buildCases();
+  const sb=document.getElementById('cases-sidebar');
+  sb.innerHTML=cases.map(c=>`<div style="display:flex;align-items:center;gap:8px;padding:9px;border:1px solid ${selectedCase===c.name?'var(--blue)':'var(--border)'};border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;background:${selectedCase===c.name?'var(--blue-bg)':'#fff'};" onclick="selectCase('${c.name}')">
+    <div class="avatar" style="width:28px;height:28px;font-size:10px;background:var(--blue-bg);color:var(--blue-text);">${initials(c.name)}</div>
+    <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.name}</div><div style="font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.diagnosis}</div></div>
+    <div style="text-align:right;flex-shrink:0;">${c.sc!==null?`<div style="font-size:13px;font-weight:700;color:${scColor(c.sc)};">${c.sc}%</div>`:''} ${c.alerts.length?`<div style="font-size:9px;color:var(--amber);">⚠ ${c.alerts.length}</div>`:''}</div>
+  </div>`).join('')||'<div class="empty">No cases.</div>';
+  if(selectedCase) drawCaseDetail(selectedCase);
+}
+function selectCase(n){selectedCase=n;renderCases();}
+
+function drawCaseDetail(name){
+  const cases=buildCases(); const c=cases.find(x=>x.name===name);
+  if(!c) return;
+  const dp=document.getElementById('cases-detail');
+  const sc=c.sc||0;
+  const stageSteps=['screened','early','mid-program','advanced','discharge-ready'];
+  const stageLabels=['Screened','Early 1–4','Mid 5–8','Advanced 9+','Discharge'];
+  const stageEmoji=['📋','🏃','⚡','🎯','✅'];
+  const stageIdx=stageSteps.indexOf(c.stage);
+  dp.innerHTML=`
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div class="avatar" style="width:40px;height:40px;font-size:14px;background:var(--blue-bg);color:var(--blue-text);">${initials(name)}</div>
+        <div style="flex:1;"><div style="font-size:15px;font-weight:600;">${name}</div><div style="font-size:11px;color:var(--text2);">${c.diagnosis} · ${c.provider}</div></div>
+        ${c.eligibility?`<span class="badge ${c.eligibility==='Eligible'?'b-green':c.eligibility==='Ineligible'?'b-red':'b-amber'}">${c.eligibility}</span>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;text-align:center;">
+        <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">VISITS</div><div style="font-size:20px;font-weight:700;">${c.pv.length}</div></div>
+        <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">LATEST</div><div style="font-size:20px;font-weight:700;color:${scColor(sc)};">${sc||'–'}${sc?'%':''}</div></div>
+        <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">CHANGE</div><div style="font-size:20px;font-weight:700;color:${c.pv.length>1&&sc-(c.pv[0].scores?.overall||0)>=0?'var(--green)':'var(--red)'}">${c.pv.length>1?(sc-(c.pv[0].scores?.overall||0)>=0?'+':'')+(sc-(c.pv[0].scores?.overall||0))+'%':'–'}</div></div>
+        <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">ALERTS</div><div style="font-size:20px;font-weight:700;color:${c.alerts.length?'var(--amber)':'var(--green)'};">${c.alerts.length}</div></div>
+      </div>
+      <div class="pipeline">${stageSteps.map((s,i)=>`<div class="pipe-step ${i<stageIdx?'pipe-done':i===stageIdx?'pipe-active':'pipe-pending'}" style="font-size:9px;"><div>${stageEmoji[i]}</div>${stageLabels[i]}</div>`).join('')}</div>
+      ${c.alerts.map(a=>`<div class="flag-row"><span class="flag-icon" style="color:var(--${a.t});">▲</span>${a.m}</div>`).join('')}
+      <div class="section-title" style="margin-top:10px;">Journey timeline</div>
+      <div class="timeline">
+        ${c.latestScreen?`<div class="tl-node ${c.latestScreen.result?.eligibility==='Eligible'?'tl-done':c.latestScreen.result?.eligibility==='Ineligible'?'tl-bad':'tl-warn'}"><div class="tl-date">${c.latestScreen.date}</div><div class="tl-title">Screening — ${c.latestScreen.result?.eligibility||'–'}</div><div class="tl-body">${c.latestScreen.result?.riskCategory||'–'} risk · ${c.latestScreen.physician||'–'}</div></div>`:'<div class="tl-node tl-pending"><div class="tl-title">Screening — not done</div><div class="tl-body">Required per CBAHI standards</div></div>'}
+        ${c.pv.map((v,i)=>`<div class="tl-node ${(v.scores?.overall||0)>=75?'tl-done':(v.scores?.overall||0)>=50?'tl-warn':'tl-bad'}"><div class="tl-date">${v.date}</div><div class="tl-title">Visit ${i+1} · ${v.scores?.overall||0}% — ${v.provider}</div><div class="tl-body">${v.aiStatus||''}${v.supervisorComment?' · Supervisor: '+v.supervisorComment.slice(0,80):''}</div></div>`).join('')}
+        ${c.stage!=='discharge-ready'?'<div class="tl-node tl-pending"><div class="tl-title">Discharge — pending</div><div class="tl-body">Per CG021: when goals met or max rehab potential reached</div></div>':'<div class="tl-node tl-done"><div class="tl-title">Discharge criteria met ✓</div><div class="tl-body">Ready for discharge planning per CG021</div></div>'}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// CASELOAD
+// ══════════════════════════════════════════════
+function activePatients(provName){
+  const names=[...new Set(visits.map(v=>v.name))];
+  return names.filter(n=>{const pv=getVisitsFor(n);const l=pv[pv.length-1];return l?.provider===provName&&(l?.scores?.overall||0)<(settings.autoDischargeScore||88);});
+}
+
+function renderCaseload(){
+  const provs=settings.providers||[];
+  const totalCap=provs.reduce((a,p)=>a+p.maxCases,0);
+  const totalActive=provs.reduce((a,p)=>a+activePatients(p.name).length,0);
+  const totalFree=Math.max(0,totalCap-totalActive);
+  const months=[];for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({label:d.toLocaleDateString('en',{month:'short'}),key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`});}
+  const intakeCounts=months.map(m=>[...new Set(visits.filter(v=>v.date?.startsWith(m.key)).map(v=>v.name))].length);
+
+  document.getElementById('cl-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total capacity</div><div class="metric-value">${totalCap}</div></div>
+    <div class="metric"><div class="metric-label">Active cases</div><div class="metric-value ${totalActive/totalCap>=0.8?'mv-amber':'mv-green'}">${totalActive}</div><div class="metric-sub">${totalCap?Math.round(totalActive/totalCap*100):0}% utilised</div></div>
+    <div class="metric"><div class="metric-label">Free slots</div><div class="metric-value mv-green">${totalFree}</div></div>
+    <div class="metric"><div class="metric-label">Waitlist</div><div class="metric-value ${waitlist.length?'mv-amber':'mv-green'}">${waitlist.length}</div></div>
+    <div class="metric"><div class="metric-label">This month</div><div class="metric-value ${intakeCounts[5]>=(settings.maxMonthlyIntake||6)?'mv-red':'mv-green'}">${intakeCounts[5]}</div><div class="metric-sub">of ${settings.maxMonthlyIntake||6} max</div></div>
+  `;
+
+  document.getElementById('cl-providers').innerHTML=provs.map(p=>{
+    const active=activePatients(p.name).length;
+    const pct=p.maxCases?Math.round(active/p.maxCases*100):0;
+    const color=pct>=100?'var(--red)':pct>=(settings.warningThreshold||80)?'var(--amber)':'var(--green)';
+    return `<div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;"><span style="font-weight:500;">${p.name}</span><span style="font-weight:700;font-family:var(--mono);color:${color};">${active}/${p.maxCases} (${pct}%)</span></div>
+      <div class="cap-bar-wrap"><div class="cap-bar-fill" style="width:${Math.min(pct,100)}%;background:${color};"></div><div class="cap-marker" style="left:${settings.warningThreshold||80}%;"></div></div>
+      ${pct>=100?'<div style="font-size:10px;color:var(--red);font-family:var(--mono);">🔒 AT CAPACITY — No new admissions</div>':pct>=(settings.warningThreshold||80)?'<div style="font-size:10px;color:var(--amber);font-family:var(--mono);">⚠ Nearing limit</div>':''}
+    </div>`;
+  }).join('');
+
+  if(charts.cl){charts.cl.destroy();charts.cl=null;}
+  const ctx=document.getElementById('cl-chart');
+  if(ctx) charts.cl=new Chart(ctx,{type:'bar',data:{labels:months.map(m=>m.label),datasets:[{label:'New patients',data:intakeCounts,backgroundColor:'rgba(107,95,204,0.7)',borderRadius:4},{label:'Monthly limit',data:months.map(()=>settings.maxMonthlyIntake||6),type:'line',borderColor:'#C94040',borderDash:[4,3],borderWidth:1.5,pointRadius:0,fill:false,label:'Limit'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},boxWidth:10}}},scales:{y:{min:0,ticks:{font:{size:9},color:'#A09D98'}},x:{ticks:{font:{size:9},color:'#A09D98'},grid:{display:false}}}}});
+
+  // Discharge candidates
+  const cands=[...new Set(visits.map(v=>v.name))].filter(n=>{const pv=getVisitsFor(n);const l=pv[pv.length-1];return l&&((l.scores?.overall||0)>=(settings.autoDischargeScore||88)||pv.length>=12||daysSince(l.date)>45);});
+  const dc=document.getElementById('cl-discharge');
+  dc.innerHTML=cands.length?cands.map(n=>{const pv=getVisitsFor(n);const l=pv[pv.length-1];const reasons=[];if((l.scores?.overall||0)>=(settings.autoDischargeScore||88)) reasons.push(`Score ${l.scores?.overall||0}% ≥ threshold`);if(pv.length>=12) reasons.push('12+ visits completed');if(daysSince(l.date)>45) reasons.push(`No visit in ${daysSince(l.date)}d`);return`<div class="pt-row"><div class="avatar" style="width:26px;height:26px;font-size:9px;background:var(--green-bg);color:var(--green-text);">${initials(n)}</div><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;">${n}</div><div style="font-size:10px;color:var(--text2);">${reasons.join(' · ')}</div></div><span class="badge b-green">Ready</span></div>`;}).join(''):'<div class="empty">No discharge candidates at this time.</div>';
+
+  // Capacity recommendation (rule-based)
+  const overCap=provs.filter(p=>activePatients(p.name).length>=p.maxCases).length;
+  const utilPct=totalCap?Math.round(totalActive/totalCap*100):0;
+  let recText='', recColor='var(--green)';
+  if(overCap>0){recText=`🔴 ${overCap} provider(s) at full capacity. Pause new admissions for those providers. Consider discharging completed cases (${cands.length} candidates) to free ${cands.length} slot(s).`;recColor='var(--red)';}
+  else if(utilPct>=80){recText=`🟠 Utilisation at ${utilPct}% — nearing capacity limit. Restrict new admissions to Priority 1–2 only. Review discharge candidates.`;recColor='var(--amber)';}
+  else if(intakeCounts[5]>=(settings.maxMonthlyIntake||6)){recText=`🟠 Monthly intake limit (${settings.maxMonthlyIntake}) reached. No new admissions this month unless urgent (P1).`;recColor='var(--amber)';}
+  else{recText=`✓ Capacity balanced. ${totalFree} free slot(s) available. ${waitlist.length} patient(s) on waitlist ready for admission.`;recColor='var(--green)';}
+  document.getElementById('cl-recommendation').innerHTML=`<div style="padding:12px;background:var(--bg2);border-radius:var(--radius-sm);font-size:12px;border-left:3px solid ${recColor};">${recText}</div><div class="ref">Capacity thresholds per: Saudi MOH HHC 2024 provider capacity standards · CBAHI service delivery requirements</div>`;
+}
+
+// ══════════════════════════════════════════════
+// WAITLIST
+// ══════════════════════════════════════════════
+function addToWaitlist(){
+  const name=document.getElementById('wl-name').value.trim();
+  if(!name){alert('Enter patient name.');return;}
+  waitlist.push({name,diagnosis:document.getElementById('wl-dx').value,preferredProvider:document.getElementById('wl-prov').value,urgency:parseInt(document.getElementById('wl-urgency').value),eligibility:document.getElementById('wl-elig').value,riskCategory:document.getElementById('wl-risk').value,referral:document.getElementById('wl-referral').value,requestDate:today(),addedAt:new Date().toISOString()});
+  save(KEYS.waitlist,waitlist);
+  document.getElementById('wl-name').value='';
+  renderWaitlist(); calcWaitlistRec(); renderDashboard();
+}
+
+function renderWaitlist(){
+  const pLabels=['','🔴 P1 Urgent','🟠 P2 High','🔵 P3 Routine','⚪ P4 Elective'];
+  const sorted=[...waitlist].sort((a,b)=>a.urgency-b.urgency||(daysSince(b.requestDate)-daysSince(a.requestDate)));
+  const body=document.getElementById('wl-body');
+  body.innerHTML=sorted.length?`<table class="tbl"><thead><tr><th>#</th><th>Patient</th><th>Diagnosis</th><th>Urgency</th><th>Eligibility</th><th>Wait</th><th>Risk</th><th></th></tr></thead><tbody>`+
+    sorted.map((p,i)=>{
+      const overdue=daysSince(p.requestDate)>=(settings.maxWaitDays||14);
+      return`<tr><td style="font-family:var(--mono);">${i+1}</td><td style="font-weight:500;">${p.name}</td><td style="color:var(--text2);">${p.diagnosis||'–'}</td><td>${pLabels[p.urgency]||'–'}</td><td><span class="badge ${p.eligibility==='Eligible'?'b-green':p.eligibility==='Conditional'?'b-amber':'b-gray'}">${p.eligibility}</span></td><td style="font-family:var(--mono);${overdue?'color:var(--red);font-weight:700;':''}">${daysSince(p.requestDate)}d</td><td><span class="badge ${p.riskCategory==='Critical'?'b-red':p.riskCategory==='High'?'b-amber':p.riskCategory==='Low'?'b-green':'b-blue'}">${p.riskCategory}</span></td><td><button class="btn btn-xs btn-green" onclick="admitFromWaitlist('${p.name}')">Admit</button> <button class="btn btn-xs" onclick="removeFromWaitlist('${p.name}')" style="padding:3px 6px;">✕</button></td></tr>`;}).join('')+`</tbody></table>`:'<div class="empty">Waitlist is empty.</div>';
+}
+
+function admitFromWaitlist(name){if(confirm(`Admit ${name} from waitlist?`)){const i=waitlist.findIndex(w=>w.name===name);if(i>-1){waitlist.splice(i,1);save(KEYS.waitlist,waitlist);renderWaitlist();calcWaitlistRec();renderDashboard();alert(`${name} admitted. Complete screening and first visit in the tracker.`);}}}
+function removeFromWaitlist(name){if(confirm(`Remove ${name}?`)){const i=waitlist.findIndex(w=>w.name===name);if(i>-1){waitlist.splice(i,1);save(KEYS.waitlist,waitlist);renderWaitlist();calcWaitlistRec();}}}
+
+function calcWaitlistRec(){
+  const el=document.getElementById('wl-recommendation');
+  if(!waitlist.length){el.innerHTML='<div class="empty">Waitlist is empty.</div>';return;}
+  const provs=settings.providers||[];
+  const freeSlots=provs.filter(p=>activePatients(p.name).length<p.maxCases);
+  const sorted=[...waitlist].sort((a,b)=>a.urgency-b.urgency||(daysSince(b.requestDate)-daysSince(a.requestDate)));
+  const admitNow=sorted.filter(p=>p.urgency<=2&&p.eligibility==='Eligible'&&freeSlots.length>0).slice(0,freeSlots.length);
+  const escalate=sorted.filter(p=>p.urgency===1&&p.eligibility!=='Eligible');
+  const defer=sorted.filter(p=>!admitNow.includes(p)&&!escalate.includes(p));
+
+  el.innerHTML=`
+    ${admitNow.length?`<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--green);font-family:var(--mono);margin-bottom:4px;">ADMIT NOW (${freeSlots.length} slot${freeSlots.length!==1?'s':''} available)</div>${admitNow.map(p=>`<div class="flag-row"><span class="flag-icon" style="color:var(--green);">✓</span><b>${p.name}</b> — P${p.urgency}, waited ${daysSince(p.requestDate)}d, ${p.eligibility}, ${p.riskCategory} risk</div>`).join('')}</div>`:''}
+    ${escalate.length?`<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--red);font-family:var(--mono);margin-bottom:4px;">ESCALATE — URGENT REVIEW</div>${escalate.map(p=>`<div class="flag-row"><span class="flag-icon" style="color:var(--red);">▲</span><b>${p.name}</b> — Urgent but ${p.eligibility}: complete screening immediately</div>`).join('')}</div>`:''}
+    ${defer.length?`<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--text2);font-family:var(--mono);margin-bottom:4px;">DEFER</div>${defer.slice(0,4).map(p=>`<div class="flag-row"><span class="flag-icon">→</span>${p.name} — P${p.urgency}, ${daysSince(p.requestDate)}d wait, ${p.eligibility}</div>`).join('')}</div>`:''}
+    ${!freeSlots.length?`<div style="padding:8px;background:var(--red-bg);border-radius:var(--radius-sm);font-size:11px;color:var(--red-text);margin-bottom:6px;">All providers at capacity. Discharge candidates: ${[...new Set(visits.map(v=>v.name))].filter(n=>{const pv=getVisitsFor(n);const l=pv[pv.length-1];return l&&(l.scores?.overall||0)>=(settings.autoDischargeScore||88);}).length} available to free slots.</div>`:''}
+    <div class="ref">Prioritisation per Saudi MOH fairness principles · CBAHI patient rights · CMS Ch.7 admission criteria</div>`;
+}
+
+// ══════════════════════════════════════════════
+// AUDIT — Rule-based report
+// ══════════════════════════════════════════════
+function setAuditPeriod(m,el){
+  auditPeriod=m;
+  document.querySelectorAll('#page-audit .btn[data-m]').forEach(b=>{b.style.background='#fff';b.style.color='var(--text2)';});
+  if(el){el.style.background='var(--text)';el.style.color='#fff';}
+  renderAudit();
+}
+
+function renderAudit(){
+  const provs=[...new Set(visits.map(v=>v.provider))];
+  const sel=document.getElementById('audit-selector');
+  sel.innerHTML=provs.map(p=>`<button style="padding:5px 12px;border-radius:100px;border:1px solid var(--border2);background:${selectedAuditProv===p?'var(--text)':'#fff'};color:${selectedAuditProv===p?'#fff':'var(--text2)'};font-size:11px;cursor:pointer;font-family:var(--font);" onclick="selectAuditProv('${p}')">${p}</button>`).join('')||'<div class="empty">No visit data yet.</div>';
+  if(!selectedAuditProv&&provs.length) selectedAuditProv=provs[0];
+  if(selectedAuditProv) renderAuditMetrics(selectedAuditProv);
+}
+function selectAuditProv(p){selectedAuditProv=p;renderAudit();}
+
+function renderAuditMetrics(prov){
+  const cut=auditPeriod?monthsAgo(auditPeriod):'2000-01-01';
+  const pv=visits.filter(v=>v.provider===prov&&v.date>=cut);
+  const st=(key)=>pv.length?Math.round(pv.reduce((a,v)=>a+(v.scores?.[key]||0),0)/pv.length):0;
+  const avg=st('overall'), doc=st('doc'), fn=st('functional'), wn=st('woundNutrition'), qual=st('quality');
+  const pts=[...new Set(pv.map(v=>v.name))].length;
+  document.getElementById('audit-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Visits</div><div class="metric-value">${pv.length}</div></div>
+    <div class="metric"><div class="metric-label">Patients</div><div class="metric-value">${pts}</div></div>
+    <div class="metric"><div class="metric-label">Avg recovery</div><div class="metric-value ${scClass(avg)}">${avg}%</div></div>
+    <div class="metric"><div class="metric-label">Documentation</div><div class="metric-value ${scClass(doc)}">${doc}%</div></div>
+    <div class="metric"><div class="metric-label">Functional</div><div class="metric-value ${scClass(fn)}">${fn}%</div></div>
+    <div class="metric"><div class="metric-label">Wound & Nutrition</div><div class="metric-value ${scClass(wn)}">${wn}%</div></div>
+  `;
+}
+
+function generateAudit(){
+  if(!selectedAuditProv){alert('Select a provider first.');return;}
+  const cut=auditPeriod?monthsAgo(auditPeriod):'2000-01-01';
+  const pv=visits.filter(v=>v.provider===selectedAuditProv&&v.date>=cut);
+  if(!pv.length){document.getElementById('audit-result').innerHTML='<div class="empty" style="padding:1rem;">No visits in this period.</div>';return;}
+
+  const st=(key)=>pv.length?Math.round(pv.reduce((a,v)=>a+(v.scores?.[key]||0),0)/pv.length):0;
+  const avg=st('overall'), doc=st('doc'), fn=st('functional'), wn=st('woundNutrition');
+  const pts=[...new Set(pv.map(v=>v.name))].length;
+  const docDeficit=pv.filter(v=>(v.scores?.doc||0)<60).length;
+  const declining=pv.filter(v=>(v.scores?.overall||0)<50).length;
+  const comments=pv.filter(v=>v.supervisorComment).map(v=>v.supervisorComment);
+
+  // Determine rating
+  const compositeScore=Math.round(avg*0.4+doc*0.3+fn*0.2+wn*0.1);
+  const rating=compositeScore>=75?'Satisfactory':compositeScore>=55?'Needs Improvement':'Unsatisfactory';
+  const ratingColor=rating==='Satisfactory'?'var(--green)':rating==='Unsatisfactory'?'var(--red)':'var(--amber)';
+  const ratingBadge=rating==='Satisfactory'?'b-green':rating==='Unsatisfactory'?'b-red':'b-amber';
+
+  // Strengths (rule-based)
+  const strengths=[];
+  if(avg>=75) strengths.push('Recovery outcomes above Saudi MOH benchmark of 75% (HHC Guidelines 2024)');
+  if(doc>=80) strengths.push('Documentation completeness meets CMS Ch.7 and CG021 mandatory requirements');
+  if(fn>=75) strengths.push('Functional improvement scores demonstrate effective APTA-standard interventions');
+  if(wn>=75) strengths.push('Wound and nutrition integration reflects NICE NG21 holistic care approach');
+  if(declining===0) strengths.push('No declining cases in this period — consistent quality delivery');
+  if(comments.length>0) strengths.push('Supervisor engagement demonstrates active quality oversight per CBAHI standards');
+  if(strengths.length===0) strengths.push('Provider is active and delivering care within service scope');
+
+  // Gaps (rule-based)
+  const gaps=[];
+  if(avg<75) gaps.push(`Average recovery ${avg}% is below Saudi MOH benchmark (target ≥75%) — review intervention quality`);
+  if(doc<80) gaps.push(`Documentation ${doc}% below CMS Ch.7 / CG021 standard (target ≥80%) — ${docDeficit} visit(s) with deficits`);
+  if(doc<60) gaps.push('Critical: documentation below 60% — CBAHI non-compliant, immediate remediation required');
+  if(fn<70) gaps.push(`Functional outcomes ${fn}% below APTA standard (target ≥70%) — reassess intervention approach`);
+  if(wn<70) gaps.push(`Wound & nutrition integration ${wn}% — referral pathways to dietitian/wound care need strengthening (NICE NG21)`);
+  if(declining>0) gaps.push(`${declining} visit(s) with declining scores — plan of care review mandatory per CMS 30-day requirement`);
+  if(gaps.length===0) gaps.push('No significant gaps identified in this period');
+
+  // Recommendations (rule-based)
+  const recs=[];
+  if(doc<80) recs.push('Complete all 6 CG021 mandatory documentation elements for every visit — physician order, goals, frequency, HEP, discharge plan, progress notes');
+  if(avg<75) recs.push('Review and update SMART goals per CG021 criteria — ensure 3-month goal review cycle is maintained per CMS Ch.7');
+  if(wn<70) recs.push('Establish referral pathway to dietitian for at-risk patients — nutritional status directly impacts recovery per NICE NG21');
+  if(declining>0) recs.push('Initiate formal plan of care review for declining cases — consider MDT referral per CBAHI multidisciplinary standards');
+  recs.push('Conduct quarterly peer review session with supervisor to discuss clinical outcomes and guideline adherence');
+  if(recs.length<3) recs.push('Continue 30-day plan of care review cycle per CMS Chapter 7 requirements');
+
+  document.getElementById('audit-result').innerHTML=`
+    <div style="border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-size:11px;font-family:var(--mono);color:var(--text3);">AUDIT REPORT · ${selectedAuditProv}</div>
+          <div style="font-size:12px;color:var(--text2);">${auditPeriod?'Last '+auditPeriod+' months':'All time'} · ${pv.length} visits · ${pts} patients · Generated ${today()}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:22px;font-weight:700;color:${ratingColor};">${rating}</div>
+          <div style="font-size:11px;font-family:var(--mono);">Score: ${compositeScore}%</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div class="section-title">Score breakdown vs benchmarks</div>
+        <table class="tbl">
+          <thead><tr><th>Dimension</th><th>Score</th><th>Benchmark</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Recovery index</td><td style="font-family:var(--mono);font-weight:700;color:${scColor(avg)};">${avg}%</td><td>≥75%</td><td><span class="badge ${badgeCls(avg)}">${scLabel(avg)}</span></td></tr>
+            <tr><td>Documentation completeness</td><td style="font-family:var(--mono);font-weight:700;color:${scColor(doc)};">${doc}%</td><td>≥80%</td><td><span class="badge ${badgeCls(doc)}">${scLabel(doc)}</span></td></tr>
+            <tr><td>Functional improvement</td><td style="font-family:var(--mono);font-weight:700;color:${scColor(fn)};">${fn}%</td><td>≥70%</td><td><span class="badge ${badgeCls(fn)}">${scLabel(fn)}</span></td></tr>
+            <tr><td>Wound & nutrition integration</td><td style="font-family:var(--mono);font-weight:700;color:${scColor(wn)};">${wn}%</td><td>≥70%</td><td><span class="badge ${badgeCls(wn)}">${scLabel(wn)}</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div>
+          <div class="section-title" style="color:var(--green);">Strengths identified</div>
+          ${strengths.map(s=>`<div class="flag-row"><span class="flag-icon" style="color:var(--green);">✓</span>${s}</div>`).join('')}
+        </div>
+        <div>
+          <div class="section-title" style="color:var(--amber);">Gaps identified</div>
+          ${gaps.map(g=>`<div class="flag-row"><span class="flag-icon" style="color:var(--amber);">!</span>${g}</div>`).join('')}
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div class="section-title">Compliance findings</div>
+        <table class="tbl">
+          <thead><tr><th>Standard</th><th>Finding</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:500;">Saudi MOH HHC 2024</td><td>${avg>=75?'Compliant — recovery outcomes meet MOH benchmark':'Non-compliant — recovery outcomes below MOH benchmark. Improvement plan required.'}</td></tr>
+            <tr><td style="font-weight:500;">CBAHI Standards</td><td>${doc>=70?'Partially compliant — documentation meets minimum threshold':'Non-compliant — documentation deficits identified. Remedial action required.'}</td></tr>
+            <tr><td style="font-weight:500;">CMS Chapter 7</td><td>${doc>=80&&declining===0?'Compliant — documentation and 30-day review requirements met':`Attention required — ${doc<80?'documentation below standard':''}${declining>0?' · declining cases need review':''}`}</td></tr>
+            <tr><td style="font-weight:500;">CG021 PT/OT</td><td>${doc>=80?'All mandatory plan elements documented':'Mandatory documentation elements missing — complete physician order, goals, HEP, discharge plan, progress notes, frequency'}</td></tr>
+            <tr><td style="font-weight:500;">APTA 3rd ed.</td><td>${fn>=70?'Functional outcomes within APTA standards':'Functional outcomes below APTA benchmark — review intervention approach and goal setting'}</td></tr>
+            <tr><td style="font-weight:500;">CSP AGILE 2013</td><td>${avg>=60?'Acceptable — safe and effective service delivery demonstrated':'Below standard — service effectiveness needs review'}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div class="section-title">Recommendations</div>
+        ${recs.map((r,i)=>`<div class="flag-row"><span class="flag-icon" style="color:var(--blue);font-weight:700;">${i+1}.</span>${r}</div>`).join('')}
+      </div>
+
+      ${comments.length?`<div style="margin-bottom:10px;"><div class="section-title">Supervisor comments on file</div>${comments.slice(0,4).map(c=>`<div style="padding:6px 8px;background:var(--bg2);border-radius:var(--radius-sm);font-size:11px;margin-bottom:4px;border-left:2px solid var(--purple);">"${c}"</div>`).join('')}</div>`:''}
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;gap:6px;">
+        <div style="font-size:11px;color:var(--text2);">Next audit recommended: ${compositeScore>=75?'6 months':compositeScore>=55?'3 months':'1 month (urgent)'}</div>
+        <span class="badge ${ratingBadge}">${rating}</span>
+      </div>
+    </div>
+    <div class="ref">Saudi MOH HHC Guidelines 2024 · CBAHI Standards · NICE NG21 · CMS Medicare Ch.7 · CG021 PT/OT · APTA 3rd ed. · CSP AGILE 2013</div>`;
+}
+
+// ══════════════════════════════════════════════
+// SURVEY
+// ══════════════════════════════════════════════
+function setStar(n){svStar=n;document.querySelectorAll('#sv-stars .star-btn').forEach((b,i)=>b.classList.toggle('on',i<n));}
+function setNPS(n){svNPS=n;document.querySelectorAll('#sv-nps-btns .scale-btn').forEach(b=>b.classList.toggle('on',parseInt(b.textContent)===n));}
+function setSafe(v){svSafe=v;document.getElementById('sv-safe-y').className='yn-btn'+(v===1?' yn-yes':'');document.getElementById('sv-safe-n').className='yn-btn'+(v===0?' yn-no':'');}
+function setHEP(v){svHEP=v;document.getElementById('sv-hep-y').className='yn-btn'+(v===1?' yn-yes':'');document.getElementById('sv-hep-n').className='yn-btn'+(v===0?' yn-no':'');}
+function setRec(v){svRec=v;document.getElementById('sv-rec-y').className='yn-btn'+(v===1?' yn-yes':'');document.getElementById('sv-rec-n').className='yn-btn'+(v===0?' yn-no':'');}
+
+function submitSurvey(){
+  const patient=document.getElementById('sv-patient').value.trim();
+  if(!patient){alert('Enter patient name.');return;}
+  surveys.push({patient,provider:document.getElementById('sv-prov').value,date:today(),answers:{overall:svStar,nps:svNPS,safe:svSafe,hep:svHEP,recommend:svRec,comment:document.getElementById('sv-comment').value.trim()},submittedAt:new Date().toISOString()});
+  save(KEYS.surveys,surveys);
+  alert(`Survey submitted for ${patient}. شكرًا!`);
+  svStar=0;svNPS=null;svSafe=null;svHEP=null;svRec=null;
+  setStar(0);
+  document.querySelectorAll('#sv-nps-btns .scale-btn').forEach(b=>b.classList.remove('on'));
+  ['sv-safe-y','sv-safe-n','sv-hep-y','sv-hep-n','sv-rec-y','sv-rec-n'].forEach(id=>document.getElementById(id).className='yn-btn');
+  document.getElementById('sv-patient').value='';
+  document.getElementById('sv-comment').value='';
+  renderSurvey();
+}
+
+function renderSurvey(){
+  const total=surveys.length;
+  const avgOverall=total?Math.round(surveys.reduce((a,s)=>a+((s.answers.overall||0)/5*100),0)/total):0;
+  const npsScores=surveys.map(s=>s.answers.nps).filter(v=>v!==null&&v!==undefined);
+  const nps=npsScores.length?Math.round((npsScores.filter(s=>s>=9).length/npsScores.length-npsScores.filter(s=>s<=6).length/npsScores.length)*100):null;
+  const recomm=total?Math.round(surveys.filter(s=>s.answers.recommend===1).length/total*100):0;
+  const safe=total?Math.round(surveys.filter(s=>s.answers.safe===1).length/total*100):0;
+  const hep=total?Math.round(surveys.filter(s=>s.answers.hep===1).length/total*100):0;
+
+  document.getElementById('sv-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Surveys</div><div class="metric-value">${total}</div></div>
+    <div class="metric"><div class="metric-label">Satisfaction</div><div class="metric-value ${scClass(avgOverall)}">${avgOverall||'–'}${avgOverall?'%':''}</div></div>
+    <div class="metric"><div class="metric-label">Recommend</div><div class="metric-value ${scClass(recomm)}">${recomm||'–'}${recomm?'%':''}</div></div>
+    <div class="metric"><div class="metric-label">Felt safe</div><div class="metric-value ${scClass(safe)}">${safe||'–'}${safe?'%':''}</div></div>
+    <div class="metric"><div class="metric-label">HEP received</div><div class="metric-value ${scClass(hep)}">${hep||'–'}${hep?'%':''}</div></div>
+  `;
+
+  const npsEl=document.getElementById('sv-nps');
+  npsEl.textContent=nps!==null?(nps>0?'+':'')+nps:'–';
+  npsEl.style.color=nps===null?'var(--text3)':nps>=30?'var(--green)':nps>=0?'var(--amber)':'var(--red)';
+
+  const sl=document.getElementById('sv-list');
+  sl.innerHTML=[...surveys].reverse().slice(0,12).map(s=>`
+    <div style="padding:9px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
+        <div style="font-size:12px;font-weight:500;">${s.patient} <span style="font-weight:400;color:var(--text2);font-size:10px;">· ${s.provider} · ${s.date}</span></div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span style="font-size:15px;color:var(--amber);">${'★'.repeat(s.answers.overall||0)}</span>
+          ${s.answers.nps!==null&&s.answers.nps!==undefined?`<span class="badge ${s.answers.nps>=9?'b-green':s.answers.nps>=7?'b-blue':'b-red'}" style="font-family:var(--mono);">NPS ${s.answers.nps}</span>`:''}
+          ${s.answers.safe===1?'<span class="badge b-green">Safe ✓</span>':''}
+          ${s.answers.hep===0?'<span class="badge b-amber">No HEP</span>':''}
+        </div>
+      </div>
+      ${s.answers.comment?`<div style="font-size:11px;color:var(--text2);margin-top:4px;font-style:italic;">"${s.answers.comment}"</div>`:''}
+    </div>`).join('')||'<div class="empty">No surveys submitted yet.</div>';
+}
+
+function calcSurveyAnalysis(){
+  const el=document.getElementById('sv-analysis');
+  if(!surveys.length){el.innerHTML='<div class="empty">No surveys yet.</div>';return;}
+  const total=surveys.length;
+  const npsScores=surveys.map(s=>s.answers.nps).filter(v=>v!==null&&v!==undefined);
+  const nps=npsScores.length?Math.round((npsScores.filter(s=>s>=9).length/npsScores.length-npsScores.filter(s=>s<=6).length/npsScores.length)*100):null;
+  const avgStar=surveys.reduce((a,s)=>a+(s.answers.overall||0),0)/total;
+  const safeRate=Math.round(surveys.filter(s=>s.answers.safe===1).length/total*100);
+  const hepRate=Math.round(surveys.filter(s=>s.answers.hep===1).length/total*100);
+  const recRate=Math.round(surveys.filter(s=>s.answers.recommend===1).length/total*100);
+  const comments=surveys.filter(s=>s.answers.comment?.trim()).map(s=>s.answers.comment);
+
+  // Rule-based sentiment
+  const grade=avgStar>=4.5?'A':avgStar>=3.5?'B':avgStar>=2.5?'C':'D';
+  const sentiment=avgStar>=4?'Positive':avgStar>=3?'Mixed':'Negative';
+  const sentColor=sentiment==='Positive'?'var(--green)':sentiment==='Negative'?'var(--red)':'var(--amber)';
+
+  const strengths=[], concerns=[], cbahiFlags=[];
+  if(safeRate>=90) strengths.push('Patient safety — CBAHI standard met ('+safeRate+'% felt safe)');
+  if(recRate>=80) strengths.push('High recommendation rate ('+recRate+'%) reflects strong patient trust');
+  if(avgStar>=4) strengths.push('Overall satisfaction ('+avgStar.toFixed(1)+'/5) above benchmark');
+  if(safeRate<80) cbahiFlags.push('Safety perception below 80% — CBAHI patient safety review required');
+  if(hepRate<70) cbahiFlags.push('HEP delivery below 70% ('+hepRate+'%) — APTA documentation standard not met');
+  if(hepRate<70) concerns.push('Home exercise program not consistently delivered ('+hepRate+'%) — provider training needed');
+  if(recRate<70) concerns.push('Recommendation rate low ('+recRate+'%) — investigate patient experience gaps');
+  if(nps!==null&&nps<20) concerns.push('NPS below benchmark ('+nps+') — identify and address detractors');
+  if(strengths.length===0) strengths.push('Surveys collected — baseline established');
+  if(concerns.length===0) concerns.push('No significant concerns identified at this time');
+
+  el.innerHTML=`<div style="margin-top:10px;padding:12px;background:var(--bg2);border-radius:var(--radius-sm);">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+      <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">SENTIMENT</div><div style="font-size:14px;font-weight:700;color:${sentColor};">${sentiment}</div></div>
+      <div><div style="font-size:9px;font-family:var(--mono);color:var(--text3);">GRADE</div><div style="font-size:24px;font-weight:700;">${grade}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div><div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px;">Strengths</div>${strengths.map(s=>`<div class="flag-row"><span class="flag-icon" style="color:var(--green);">✓</span>${s}</div>`).join('')}</div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--amber);margin-bottom:3px;">Concerns</div>${concerns.map(s=>`<div class="flag-row"><span class="flag-icon" style="color:var(--amber);">!</span>${s}</div>`).join('')}</div>
+    </div>
+    ${cbahiFlags.length?`<div style="margin-bottom:6px;"><div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px;">CBAHI flags</div>${cbahiFlags.map(f=>`<div class="flag-row"><span class="flag-icon" style="color:var(--red);">▲</span>${f}</div>`).join('')}</div>`:''}
+    <div class="ref">HHCAHPS domains · CBAHI patient rights · Saudi MOH patient rights · APTA 3rd ed.</div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// GUIDELINES
+// ══════════════════════════════════════════════
+function renderGuidelines(){
+  const el=document.getElementById('guidelines-body');
+  if(!el) return;
+  const refs=[
+    ['🇸🇦 Saudi MOH Home Health Care Guidelines 2024','Eligibility: homebound status confirmed by physician, physician referral, SMART goals documented, qualified MOH-credentialed providers. Mandatory: care plan with goals and frequency, regular supervisory visits, outcome measurement, patient rights and cultural sensitivity. Scoring basis: homebound criteria, care plan elements, qualified provider confirmation.'],
+    ['🏥 CBAHI Home Health Care Accreditation Standards','Accreditation requires: written care plan documentation, qualified credentialed providers, infection control protocols, patient safety procedures, supervisor visit records, incident reporting system, outcome measurement system. Scoring basis: documentation completeness, safety record, provider qualifications.'],
+    ['🇬🇧 NICE Guideline NG21 — Home Care','Person-centred care, continuity of care staff, care coordination, written care plans reviewed regularly, carer involvement in all sessions, safe medication management, nutritional and wound care integration. Scoring basis: patient-centred outcomes, carer training, nutritional and wound status.'],
+    ['🇺🇸 CMS Medicare Benefit Policy Manual — Chapter 7','Coverage requirements: homebound status confirmed, physician-approved plan of care, skilled need demonstrated (PT/OT/SN), improvement expected over predictable period, plan reviewed every 30 days, six skilled disciplines. Scoring basis: homebound criteria, physician order, documentation 30-day review.'],
+    ['📋 CG021 — Home Care PT/OT Clinical Guideline','All criteria must be met for admission: licensed prescriber order, homebound confirmed, rehab potential evident, sustainable improvement expected in ROM/strength/function/pain/ADLs. Plan of care must include: ICD diagnosis, prior functioning, SMART goals ≤3 months, visit frequency, techniques, discharge plan. Basis for 6 mandatory documentation elements.'],
+    ['🏋️ APTA — Providing Physical Therapy in the Home (3rd edition)','PT evaluation, plan of care, case management, discharge planning per ICF model. Documentation requirements: timely referral processing, scheduling, progress notes, infection control, caregiver training, patient experience (HHCAHPS). HEP delivery mandatory. Scoring basis: functional outcomes 10-point checklist, HEP compliance, caregiver training.'],
+    ['🦴 CSP AGILE Quality Assurance Standards 2013','10 standards: autonomy & accountability, safe/effective service delivery, learning & development, working in partnership, consent, record keeping, communication, physiotherapy management & treatment, evaluation of clinical care, promoting physiotherapy. Age must NEVER be a barrier. Goal: maximise function at every level for as long as possible. Basis for CSP AGILE outcome criteria.'],
+    ['🧬 Oxford Physiotherapy Protocols','Evidence-based exercise protocols for neurological, orthopaedic, respiratory, and geriatric home conditions. Emphasis on functional outcome measurement, standardised progression criteria, and home adaptation of hospital protocols. Reference for functional outcome benchmarking.'],
+    ['🏠 MDA Home Physical Therapy Guide — ALS 2024','Adapted PT for neurodegenerative conditions at home: energy conservation techniques, adaptive equipment prescription, respiratory support physiotherapy, caregiver competency training, fall prevention in progressive weakness, palliative goal-setting. Reference for ALS and neurodegenerative case management.'],
+    ['🇸🇦 Saudi Clinical Preventive Guideline 2023','Preventive care integration in home PT: chronic disease management (DM, HTN, cardiac), vaccination status awareness, screening for depression/malnutrition/fall risk, health promotion activities, coordination with primary health care. Basis for comorbidity and risk screening criteria.'],
+  ];
+  el.innerHTML=refs.map(([title,body])=>`
+    <div style="padding:12px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:12px;font-weight:600;margin-bottom:5px;color:var(--text);">${title}</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.7;">${body}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// DEMO DATA
+// ══════════════════════════════════════════════
+function loadDemoData(){
+  const demoVisits=[
+    {name:"Nora Al-Otaibi",date:"2025-11-10",provider:"International Medical Center",diagnosis:"Post-stroke rehabilitation",wound:"none",nutrition:"adequate",outcomes:["Static balance","Pain reduction"],docChecks:["doc-1","doc-2","doc-3"],hep:"6",engagement:"7",providerNote:"Initial assessment. Left hemiplegia. Patient motivated.",supervisorComment:"Good baseline. Intensive gait training needed.",scores:{functional:45,quality:62,doc:50,woundNutrition:100,overall:62},aiStatus:"Plateau",aiRecommendation:"Initiate intensive gait training. Focus on transfer training and balance re-education per APTA protocol."},
+    {name:"Nora Al-Otaibi",date:"2026-01-18",provider:"International Medical Center",diagnosis:"Post-stroke rehabilitation",wound:"none",nutrition:"adequate",outcomes:["Independent transfers","Static balance","Dynamic balance","Pain reduction"],docChecks:["doc-1","doc-2","doc-3","doc-5","doc-6"],hep:"8",engagement:"8",providerNote:"Transfer training progressing well.",supervisorComment:"Excellent engagement. Goals on track.",scores:{functional:70,quality:76,doc:83,woundNutrition:100,overall:76},aiStatus:"Improving",aiRecommendation:"Update SMART goals for outdoor ambulation. Caregiver training session recommended per APTA."},
+    {name:"Nora Al-Otaibi",date:"2026-04-22",provider:"International Medical Center",diagnosis:"Post-stroke rehabilitation",wound:"none",nutrition:"adequate",outcomes:["Independent transfers","Ambulation indoors","Static balance","Dynamic balance","Pain reduction","ADL independence","ROM normal","Caregiver trained"],docChecks:["doc-1","doc-2","doc-3","doc-4","doc-5","doc-6"],hep:"9",engagement:"9",providerNote:"Patient ambulating independently indoors. Discharge criteria nearly met.",supervisorComment:"Discharge criteria met. Outstanding recovery.",scores:{functional:90,quality:90,doc:100,woundNutrition:100,overall:92},aiStatus:"Improving",aiRecommendation:"Patient meets CG021 discharge criteria. Initiate discharge planning."},
+    {name:"Mohammed Al-Ghamdi",date:"2025-12-05",provider:"Erfan Hospital",diagnosis:"Orthopedic — hip replacement",wound:"improving",nutrition:"at-risk",outcomes:["Pain reduction"],docChecks:["doc-1","doc-2"],hep:"5",engagement:"6",providerNote:"6 weeks post-op. Wound healing. Weight-bearing restricted.",supervisorComment:"Nutrition at risk — dietitian referral urgent.",scores:{functional:10,quality:55,doc:33,woundNutrition:68,overall:37},aiStatus:"Declining",aiRecommendation:"Nutrition at risk — refer to dietitian urgently (Saudi MOH). Wound requires monitoring."},
+    {name:"Mohammed Al-Ghamdi",date:"2026-02-12",provider:"Erfan Hospital",diagnosis:"Orthopedic — hip replacement",wound:"none",nutrition:"adequate",outcomes:["Independent transfers","Pain reduction","Static balance"],docChecks:["doc-1","doc-2","doc-3","doc-5"],hep:"7",engagement:"7",providerNote:"Wound healed. Nutrition improved. Gait training commenced.",supervisorComment:"Good improvement after nutritional intervention.",scores:{functional:40,quality:66,doc:67,woundNutrition:100,overall:60},aiStatus:"Plateau",aiRecommendation:"Moderate progress. Review 30-day plan per CMS requirements."},
+    {name:"Mohammed Al-Ghamdi",date:"2026-05-03",provider:"Erfan Hospital",diagnosis:"Orthopedic — hip replacement",wound:"none",nutrition:"adequate",outcomes:["Independent transfers","Static balance","Dynamic balance","Ambulation indoors","Pain reduction","ROM normal"],docChecks:["doc-1","doc-2","doc-3","doc-4","doc-5","doc-6"],hep:"8",engagement:"8",providerNote:"Good ROM. Ambulating independently.",supervisorComment:"Close to discharge criteria.",scores:{functional:70,quality:76,doc:100,woundNutrition:100,overall:83},aiStatus:"Improving",aiRecommendation:"Approaching discharge criteria. Confirm stair independence and update discharge plan per CG021."},
+    {name:"Fatima Al-Shehri",date:"2026-01-20",provider:"Fakeeh Hospital",diagnosis:"COPD / respiratory",wound:"none",nutrition:"poor",outcomes:[],docChecks:["doc-1"],hep:"3",engagement:"4",providerNote:"Severe dyspnoea. Nutritional status critically poor.",supervisorComment:"Urgent MDT referral needed.",scores:{functional:0,quality:37,doc:17,woundNutrition:15,overall:14},aiStatus:"Declining",aiRecommendation:"Critical: refer to pulmonologist and dietitian before next session per NICE NG21."},
+    {name:"Fatima Al-Shehri",date:"2026-03-15",provider:"Fakeeh Hospital",diagnosis:"COPD / respiratory",wound:"none",nutrition:"at-risk",outcomes:["Pain reduction"],docChecks:["doc-1","doc-2","doc-5"],hep:"4",engagement:"5",providerNote:"Pulmonology review completed. O2 supplementation.",supervisorComment:"Marginal improvement.",scores:{functional:10,quality:45,doc:50,woundNutrition:60,overall:34},aiStatus:"Declining",aiRecommendation:"Marginal improvement. Increase HEP frequency and add caregiver training per APTA."},
+    {name:"Ibrahim Al-Qahtani",date:"2025-10-15",provider:"International Medical Center",diagnosis:"Neurological — Parkinson's",wound:"none",nutrition:"adequate",outcomes:["Static balance","Pain reduction","ADL independence"],docChecks:["doc-1","doc-2","doc-3","doc-5"],hep:"7",engagement:"8",providerNote:"Moderate Parkinson's. Balance deficit.",supervisorComment:"Implement LSVT BIG protocol.",scores:{functional:40,quality:73,doc:67,woundNutrition:100,overall:64},aiStatus:"Improving",aiRecommendation:"Commence LSVT BIG programme per CSP AGILE. Focus on amplitude and dynamic balance."},
+    {name:"Ibrahim Al-Qahtani",date:"2026-01-22",provider:"International Medical Center",diagnosis:"Neurological — Parkinson's",wound:"none",nutrition:"adequate",outcomes:["Static balance","Dynamic balance","Ambulation indoors","Ambulation outdoors","Pain reduction","ADL independence","Caregiver trained"],docChecks:["doc-1","doc-2","doc-3","doc-4","doc-5","doc-6"],hep:"9",engagement:"9",providerNote:"Excellent response to LSVT BIG.",supervisorComment:"Prepare discharge criteria checklist.",scores:{functional:80,quality:90,doc:100,woundNutrition:100,overall:91},aiStatus:"Improving",aiRecommendation:"Update SMART goals to maintenance phase. Prepare discharge documentation per CG021."},
+    {name:"Ibrahim Al-Qahtani",date:"2026-04-30",provider:"International Medical Center",diagnosis:"Neurological — Parkinson's",wound:"none",nutrition:"adequate",outcomes:["Independent transfers","Static balance","Dynamic balance","Ambulation indoors","Ambulation outdoors","Stair negotiation","Pain reduction","ADL independence","ROM normal","Caregiver trained"],docChecks:["doc-1","doc-2","doc-3","doc-4","doc-5","doc-6"],hep:"10",engagement:"10",providerNote:"All functional goals met. Family fully trained.",supervisorComment:"Outstanding outcome. Document as CBAHI benchmark case.",scores:{functional:100,quality:100,doc:100,woundNutrition:100,overall:100},aiStatus:"Improving",aiRecommendation:"All CG021 discharge criteria met. Discharge with maintenance HEP and 3-month community follow-up."},
+    {name:"Ahmad Al-Mutairi",date:"2026-02-20",provider:"Saudi German Hospital",diagnosis:"Cardiac rehabilitation",wound:"none",nutrition:"adequate",outcomes:["Pain reduction"],docChecks:["doc-1"],hep:"4",engagement:"5",providerNote:"Post-CABG 8 weeks. Limited functional tolerance.",supervisorComment:"Documentation critically incomplete. Cardiac clearance must be on file.",scores:{functional:10,quality:45,doc:17,woundNutrition:100,overall:36},aiStatus:"Declining",aiRecommendation:"Documentation critically incomplete — CMS Ch.7 violation. Physician order and cardiac clearance required before next session."},
+    {name:"Ahmad Al-Mutairi",date:"2026-04-05",provider:"Saudi German Hospital",diagnosis:"Cardiac rehabilitation",wound:"none",nutrition:"adequate",outcomes:["Pain reduction","ADL independence"],docChecks:["doc-1","doc-5","doc-2"],hep:"5",engagement:"6",providerNote:"Cardiac clearance obtained. Graded exercise commenced.",supervisorComment:"Improvement in documentation. Continue graded progression.",scores:{functional:20,quality:52,doc:50,woundNutrition:100,overall:48},aiStatus:"Plateau",aiRecommendation:"Documentation now at minimum standard. Increase exercise per Borg scale. Update 30-day plan per CMS."},
+    {name:"Omar Al-Dosari",date:"2026-03-01",provider:"Saudi German Hospital",diagnosis:"Orthopedic — hip replacement",wound:"none",nutrition:"adequate",outcomes:["Independent transfers","Pain reduction"],docChecks:["doc-1"],hep:"4",engagement:"5",providerNote:"Post-THR. Limited documentation.",supervisorComment:"Critical documentation gaps — CG021 non-compliant.",scores:{functional:20,quality:40,doc:17,woundNutrition:100,overall:38},aiStatus:"Declining",aiRecommendation:"Documentation critically incomplete — all 6 CG021 mandatory elements must be completed. Provider requires remedial training."},
+    {name:"Omar Al-Dosari",date:"2026-05-02",provider:"Saudi German Hospital",diagnosis:"Orthopedic — hip replacement",wound:"none",nutrition:"adequate",outcomes:["Independent transfers","Static balance","Pain reduction","ROM normal"],docChecks:["doc-1","doc-2","doc-3","doc-5"],hep:"6",engagement:"6",providerNote:"Documentation improved post remedial training.",supervisorComment:"Continue monitoring.",scores:{functional:40,quality:55,doc:67,woundNutrition:100,overall:59},aiStatus:"Plateau",aiRecommendation:"Documentation improving. Reassess SMART goals at next visit per CMS 30-day review."},
+  ];
+  const demoScreened=[
+    {name:"Nora Al-Otaibi",age:68,diagnosis:"Post-stroke rehabilitation",physician:"Dr. Ahmad Al-Subaie — Neurology",date:"2025-11-05",result:{eligibility:"Eligible",riskCategory:"Moderate",eligibilityScore:85,riskScore:48,rationale:"All CG021 mandatory criteria met. Homebound confirmed post-CVA. Moderate risk — fall history.",gaps:[],conditions:[],nextAction:"Schedule initial PT within 48 hours per Saudi MOH standards."}},
+    {name:"Mohammed Al-Ghamdi",age:74,diagnosis:"Orthopedic — hip replacement",physician:"Dr. Khalid Al-Otaibi — Orthopaedics",date:"2025-11-28",result:{eligibility:"Conditional",riskCategory:"High",eligibilityScore:70,riskScore:70,rationale:"Conditional — dietitian review required. Nutritional risk and active wound present (NICE NG21).",gaps:["Dietitian referral pending"],conditions:["Dietitian clearance before first PT session","Wound care plan must be active"],nextAction:"Dietitian clearance required before first visit."}},
+    {name:"Fatima Al-Shehri",age:55,diagnosis:"COPD / respiratory",physician:"Dr. Layla Al-Harbi — Respiratory",date:"2026-01-14",result:{eligibility:"Conditional",riskCategory:"High",eligibilityScore:62,riskScore:78,rationale:"Conditional — severe nutritional deficiency and uncontrolled COPD. Pulmonology clearance mandatory.",gaps:["Pulmonology clearance not obtained"],conditions:["Pulmonology clearance required","Dietitian intervention before PT"],nextAction:"Pulmonology + nutrition clearance before any PT session."}},
+    {name:"Ibrahim Al-Qahtani",age:82,diagnosis:"Neurological — Parkinson's",physician:"Dr. Sara Al-Mutairi — Neurology",date:"2025-10-10",result:{eligibility:"Eligible",riskCategory:"Moderate",eligibilityScore:90,riskScore:40,rationale:"Fully eligible. All CG021 criteria met. Age 82 — not a barrier per CSP AGILE 2013. Fall prevention protocol mandatory.",gaps:[],conditions:[],nextAction:"Commence within 24 hours. Implement fall prevention protocol."}},
+    {name:"Ahmad Al-Mutairi",age:61,diagnosis:"Cardiac rehabilitation",physician:"Dr. Hassan Al-Rashidi — Cardiology",date:"2026-02-18",result:{eligibility:"Conditional",riskCategory:"High",eligibilityScore:65,riskScore:65,rationale:"Conditional — cardiac clearance for exercise mandatory before PT. Post-CABG requires graded exercise protocol per CMS Ch.7.",gaps:["Cardiac exercise clearance missing"],conditions:["Cardiac clearance letter required","Baseline ECG and BP documented"],nextAction:"Written cardiac clearance from cardiologist before first PT session."}},
+    {name:"Omar Al-Dosari",age:58,diagnosis:"Orthopedic — hip replacement",physician:"Dr. Nadia Al-Mutairi — Orthopaedics",date:"2026-02-25",result:{eligibility:"Eligible",riskCategory:"Low",eligibilityScore:80,riskScore:20,rationale:"Eligible. Post-THR homebound confirmed. All CG021 criteria met. Monitor provider documentation compliance closely.",gaps:[],conditions:[],nextAction:"Commence initial assessment. Monitor documentation compliance."}},
+  ];
+  const demoWaitlist=[
+    {name:"Salma Al-Dosari",diagnosis:"Spinal cord injury — T4 complete",preferredProvider:"International Medical Center",urgency:1,eligibility:"Eligible",riskCategory:"Critical",referral:"King Fahad Medical City",requestDate:"2026-04-12",addedAt:"2026-04-12T10:00:00Z"},
+    {name:"Yusuf Al-Mutairi",diagnosis:"Post-stroke — severe",preferredProvider:"International Medical Center",urgency:1,eligibility:"Conditional",riskCategory:"High",referral:"National Neuroscience Institute",requestDate:"2026-04-18",addedAt:"2026-04-18T10:00:00Z"},
+    {name:"Reem Al-Ghamdi",diagnosis:"Post-op hip replacement",preferredProvider:"Erfan Hospital",urgency:2,eligibility:"Eligible",riskCategory:"Moderate",referral:"Saudi German Hospital",requestDate:"2026-04-22",addedAt:"2026-04-22T10:00:00Z"},
+    {name:"Tariq Al-Anazi",diagnosis:"Parkinson's — balance deficit",preferredProvider:"Fakeeh Hospital",urgency:3,eligibility:"Eligible",riskCategory:"Moderate",referral:"Neurology clinic",requestDate:"2026-05-01",addedAt:"2026-05-01T10:00:00Z"},
+    {name:"Mona Al-Shehri",diagnosis:"COPD deconditioning",preferredProvider:"any",urgency:3,eligibility:"Pending",riskCategory:"Moderate",referral:"MOH Primary Health Care",requestDate:"2026-05-05",addedAt:"2026-05-05T10:00:00Z"},
+  ];
+  const demoSurveys=[
+    {patient:"Nora Al-Otaibi",provider:"International Medical Center",date:"2026-05-01",answers:{overall:5,nps:10,safe:1,hep:1,recommend:1,comment:"الخدمة ممتازة. أتحرك باستقلالية تامة الآن. شكرًا جزيلًا. — Excellent. I can now move independently at home."},submittedAt:"2026-05-01T10:00:00Z"},
+    {patient:"Ibrahim Al-Qahtani",provider:"International Medical Center",date:"2026-05-03",answers:{overall:5,nps:10,safe:1,hep:1,recommend:1,comment:"أبي تحسّن بشكل ملحوظ. المعالجة صبورة ومحترفة. نوصي بشدة. — My father improved remarkably. Highly recommend."},submittedAt:"2026-05-03T10:00:00Z"},
+    {patient:"Mohammed Al-Ghamdi",provider:"Erfan Hospital",date:"2026-05-04",answers:{overall:4,nps:8,safe:1,hep:1,recommend:1,comment:"الخدمة جيدة. كان هناك تأخير في التحويل للأخصائية في البداية. — Good service. Initial delay in dietitian referral."},submittedAt:"2026-05-04T10:00:00Z"},
+    {patient:"Ahmad Al-Mutairi",provider:"Saudi German Hospital",date:"2026-04-10",answers:{overall:3,nps:5,safe:1,hep:0,recommend:null,comment:"The therapist was friendly but I was not given a written exercise program. Sessions were sometimes cancelled without notice. Documentation seemed incomplete."},submittedAt:"2026-04-10T10:00:00Z"},
+    {patient:"Omar Al-Dosari",provider:"Saudi German Hospital",date:"2026-05-03",answers:{overall:3,nps:6,safe:1,hep:0,recommend:null,comment:"لم يُعطَ لي برنامج تمارين منزلية واضح. أرجو تحسين التوثيق. — No clear home exercise program given. Please improve documentation."},submittedAt:"2026-05-03T10:00:00Z"},
+  ];
+
+  const existV=new Set(visits.map(v=>v.name+v.date));
+  demoVisits.forEach(v=>{if(!existV.has(v.name+v.date)) visits.push(v);});
+  const existS=new Set(screened.map(s=>s.name+s.date));
+  demoScreened.forEach(s=>{if(!existS.has(s.name+s.date)) screened.push(s);});
+  const existW=new Set(waitlist.map(w=>w.name));
+  demoWaitlist.forEach(w=>{if(!existW.has(w.name)) waitlist.push(w);});
+  const existSv=new Set(surveys.map(s=>s.patient+s.date));
+  demoSurveys.forEach(s=>{if(!existSv.has(s.patient+s.date)) surveys.push(s);});
+
+  save(KEYS.visits,visits); save(KEYS.screened,screened); save(KEYS.waitlist,waitlist); save(KEYS.surveys,surveys);
+  alert('✓ Demo data loaded — 6 patients, 15 visits, 5 screened, 5 waitlist, 5 surveys.');
+  populateDatalist(); renderDashboard();
+}
+
+// START
+init();
+</script>
+</body>
+</html>
