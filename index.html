@@ -678,13 +678,28 @@ input,select,textarea,button{font-family:var(--font);font-size:13px}
   <!-- ══════════ EMAIL REPORT ══════════ -->
   <div class="page" id="page-email">
     <div class="card">
-      <div class="card-title"><span class="dot dot-blue"></span>EmailJS Configuration</div>
+      <div class="card-title"><span class="dot dot-blue"></span>Composio Configuration</div>
       <div class="form-row">
-        <div class="field"><label>Service ID</label><input id="ejs-service" placeholder="service_xxxxxxx" oninput="saveEmailConfig()"/></div>
-        <div class="field"><label>Template ID</label><input id="ejs-template" placeholder="template_xxxxxxx" oninput="saveEmailConfig()"/></div>
+        <div class="field"><label>API Key</label><input id="cp-apikey" type="password" placeholder="Your Composio API key" oninput="saveEmailConfig()"/></div>
+        <div class="field">
+          <label>Email App</label>
+          <select id="cp-app" onchange="saveEmailConfig()">
+            <option value="GMAIL">Gmail</option>
+            <option value="OUTLOOK">Microsoft Outlook</option>
+          </select>
+        </div>
       </div>
-      <div class="field"><label>Public Key</label><input id="ejs-pubkey" placeholder="your_public_key_here" oninput="saveEmailConfig()"/></div>
-      <p style="font-size:10px;color:var(--text3);margin-top:6px;">Register free at <strong>emailjs.com</strong> → Email Services → create a service, then create a template with variables <code>{{to_email}}</code>, <code>{{subject}}</code>, <code>{{message}}</code>.</p>
+      <div class="form-row">
+        <div class="field"><label>Connected Account ID</label><input id="cp-account" placeholder="e.g. 64fa3c…" oninput="saveEmailConfig()"/></div>
+        <div class="field" style="display:flex;align-items:flex-end;">
+          <button class="btn btn-sm" style="margin-bottom:10px;" onclick="fetchComposioAccounts()">🔍 Fetch Account IDs</button>
+        </div>
+      </div>
+      <p style="font-size:10px;color:var(--text3);margin-top:4px;">
+        1. Sign up at <strong>composio.dev</strong> &nbsp;·&nbsp;
+        2. Connect your Gmail or Outlook account &nbsp;·&nbsp;
+        3. Copy your API key from Settings → API Keys
+      </p>
     </div>
     <div class="card">
       <div class="card-title"><span class="dot dot-green"></span>Compose &amp; Send</div>
@@ -694,7 +709,7 @@ input,select,textarea,button{font-family:var(--font);font-size:13px}
       </div>
       <div class="field"><label>Message</label><textarea id="email-body" rows="7" placeholder="Write your report or message here…"></textarea></div>
       <div class="btn-row">
-        <button class="btn btn-green" onclick="sendEmailJS()">✉ Send via EmailJS</button>
+        <button class="btn btn-green" onclick="sendViaComposio()">✉ Send via Composio</button>
         <button class="btn" onclick="sendMailto()">📧 Open in Mail App</button>
       </div>
       <div id="email-status" style="margin-top:10px;font-size:12px;min-height:18px;"></div>
@@ -706,7 +721,6 @@ input,select,textarea,button{font-family:var(--font);font-size:13px}
 </div><!-- /shell -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 // ══════════════════════════════════════════════
 // DATA LAYER — localStorage only, no external calls
@@ -1947,35 +1961,62 @@ function loadDemoData(){
 }
 
 // ═══════════════════════════════════════════
-// EMAIL — EmailJS + mailto fallback
+// EMAIL — Composio REST API + mailto fallback
 // ═══════════════════════════════════════════
+const COMPOSIO_BASE='https://backend.composio.dev/api/v1';
+
 function loadEmailConfig(){
-  document.getElementById('ejs-service').value=localStorage.getItem('ejs_service')||'';
-  document.getElementById('ejs-template').value=localStorage.getItem('ejs_template')||'';
-  document.getElementById('ejs-pubkey').value=localStorage.getItem('ejs_pubkey')||'';
+  document.getElementById('cp-apikey').value=localStorage.getItem('cp_apikey')||'';
+  document.getElementById('cp-account').value=localStorage.getItem('cp_account')||'';
+  document.getElementById('cp-app').value=localStorage.getItem('cp_app')||'GMAIL';
 }
 function saveEmailConfig(){
-  localStorage.setItem('ejs_service',document.getElementById('ejs-service').value);
-  localStorage.setItem('ejs_template',document.getElementById('ejs-template').value);
-  localStorage.setItem('ejs_pubkey',document.getElementById('ejs-pubkey').value);
+  localStorage.setItem('cp_apikey',document.getElementById('cp-apikey').value);
+  localStorage.setItem('cp_account',document.getElementById('cp-account').value);
+  localStorage.setItem('cp_app',document.getElementById('cp-app').value);
 }
-function sendEmailJS(){
-  const svc=document.getElementById('ejs-service').value.trim();
-  const tpl=document.getElementById('ejs-template').value.trim();
-  const key=document.getElementById('ejs-pubkey').value.trim();
+async function fetchComposioAccounts(){
+  const key=document.getElementById('cp-apikey').value.trim();
+  const st=document.getElementById('email-status');
+  if(!key){st.innerHTML='<span style="color:var(--amber)">⚠ Enter your Composio API key first.</span>';return;}
+  st.innerHTML='<span style="color:var(--blue)">⏳ Fetching connected accounts…</span>';
+  try{
+    const r=await fetch(COMPOSIO_BASE+'/connectedAccounts',{headers:{'X-API-Key':key}});
+    const d=await r.json();
+    const items=d.items||d.connectedAccounts||[];
+    if(!items.length){st.innerHTML='<span style="color:var(--amber)">⚠ No connected accounts found. Connect an account on composio.dev first.</span>';return;}
+    const list=items.map(a=>'<strong>'+a.id+'</strong> ('+( a.appName||a.integrationId||'?')+')').join('<br>');
+    st.innerHTML='<span style="color:var(--blue)">Connected accounts:<br>'+list+'<br><small style="color:var(--text3)">Copy the ID matching your Gmail or Outlook account into the field above.</small></span>';
+    if(items.length===1){document.getElementById('cp-account').value=items[0].id;saveEmailConfig();}
+  }catch(e){st.innerHTML='<span style="color:var(--red)">✗ Network error: '+e.message+'</span>';}
+}
+async function sendViaComposio(){
+  const key=document.getElementById('cp-apikey').value.trim();
+  const acct=document.getElementById('cp-account').value.trim();
+  const app=document.getElementById('cp-app').value;
   const to=document.getElementById('email-to').value.trim();
   const subj=document.getElementById('email-subject').value.trim();
   const body=document.getElementById('email-body').value.trim();
   const st=document.getElementById('email-status');
-  if(!svc||!tpl||!key){
-    st.innerHTML='<span style="color:var(--amber)">⚠ Enter your EmailJS Service ID, Template ID, and Public Key above first.</span>';
-    return;
-  }
-  st.innerHTML='<span style="color:var(--blue)">⏳ Sending…</span>';
-  emailjs.init(key);
-  emailjs.send(svc,tpl,{to_email:to,subject:subj,message:body})
-    .then(()=>{st.innerHTML='<span style="color:var(--green)">✓ Email sent successfully to '+to+'</span>';})
-    .catch(e=>{st.innerHTML='<span style="color:var(--red)">✗ Failed: '+(e.text||JSON.stringify(e))+'</span>';});
+  if(!key||!acct){st.innerHTML='<span style="color:var(--amber)">⚠ Enter your Composio API key and Connected Account ID above first.</span>';return;}
+  st.innerHTML='<span style="color:var(--blue)">⏳ Sending via Composio…</span>';
+  const action=app==='GMAIL'?'GMAIL_SEND_EMAIL':'MICROSOFT_OUTLOOK_SEND_EMAIL';
+  const input=app==='GMAIL'
+    ?{recipient_email:to,subject:subj,body:body}
+    :{to:[{email:to}],subject:subj,body:body};
+  try{
+    const r=await fetch(COMPOSIO_BASE+'/actions/'+action+'/execute',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-API-Key':key},
+      body:JSON.stringify({connectedAccountId:acct,input})
+    });
+    const d=await r.json();
+    if(r.ok&&(d.successfull||d.success||d.status==='success'||d.data)){
+      st.innerHTML='<span style="color:var(--green)">✓ Email sent to '+to+' via Composio!</span>';
+    }else{
+      st.innerHTML='<span style="color:var(--red)">✗ Composio error: '+JSON.stringify(d)+'</span>';
+    }
+  }catch(e){st.innerHTML='<span style="color:var(--red)">✗ Network error: '+e.message+'</span>';}
 }
 function sendMailto(){
   const to=document.getElementById('email-to').value.trim();
