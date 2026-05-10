@@ -264,6 +264,33 @@ input,select,textarea,button{font-family:var(--font);font-size:13px}
   .hamburger{display:block}
   .content{padding:14px}
 }
+
+/* ── CHANNELS ── */
+.ch-layout{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;min-height:520px;box-shadow:var(--shadow)}
+.ch-side{width:215px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.ch-side-hd{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ch-side-hd span{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text2)}
+.ch-list{flex:1;overflow-y:auto;padding:5px}
+.ch-item{padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer;margin-bottom:2px;transition:background .12s;border:1px solid transparent}
+.ch-item:hover{background:var(--bg2)}
+.ch-item.active{background:var(--blue-bg);border-color:rgba(42,114,184,.15)}
+.ch-item-name{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
+.ch-item.active .ch-item-name{color:var(--blue-text)}
+.ch-item-email{font-size:10px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-item-meta{font-size:9px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
+.ch-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block}
+.ch-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.ch-main-hd{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ch-compose{padding:14px 16px;flex:1}
+.ch-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--text3);gap:10px;padding:40px;text-align:center}
+.ch-hist{border-top:1px solid var(--border);max-height:210px;overflow-y:auto;padding:10px 16px}
+.ch-hist-hd{font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:7px}
+.ch-hist-row{padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.ch-hist-row:last-child{border-bottom:none}
+.ch-hist-subj{font-weight:600;color:var(--text)}
+.ch-hist-ts{font-size:9px;font-family:var(--mono);color:var(--text3)}
+.ch-hist-prev{color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;margin-top:2px}
+@media(max-width:600px){.ch-layout{flex-direction:column}.ch-side{width:100%;border-right:none;border-bottom:1px solid var(--border)}}
 </style>
 </head>
 <body>
@@ -296,6 +323,7 @@ input,select,textarea,button{font-family:var(--font);font-size:13px}
     <button class="nav-btn" onclick="showPage('guidelines',this)"><span class="icon">📚</span> References</button>
 
     <div class="nav-sec">Communications</div>
+    <button class="nav-btn" onclick="showPage('channels',this)"><span class="icon">📬</span> Channels</button>
     <button class="nav-btn" onclick="showPage('email',this)"><span class="icon">✉️</span> Email Report</button>
   </div>
 
@@ -716,6 +744,50 @@ input,select,textarea,button{font-family:var(--font);font-size:13px}
     </div>
   </div>
 
+  <!-- ══════════ CHANNELS ══════════ -->
+  <div class="page" id="page-channels">
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title" style="cursor:pointer;user-select:none;margin-bottom:0" onclick="toggleChSettings()">
+        <span class="dot dot-blue"></span>Composio Settings
+        <span id="ch-cfg-arrow" style="margin-left:auto;font-size:10px;color:var(--text3)">▼ expand</span>
+      </div>
+      <div id="ch-cfg-body" style="display:none;margin-top:12px">
+        <div class="form-row">
+          <div class="field"><label>API Key</label><input id="ch-apikey" type="password" placeholder="ak_…" oninput="saveChCfg()"/></div>
+          <div class="field">
+            <label>Email App</label>
+            <select id="ch-app" onchange="saveChCfg()">
+              <option value="GMAIL">Gmail</option>
+              <option value="OUTLOOK">Microsoft Outlook</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Connected Account ID</label><input id="ch-account" placeholder="64fa3c…" oninput="saveChCfg()"/></div>
+          <div class="field" style="display:flex;align-items:flex-end">
+            <button class="btn btn-sm" style="margin-bottom:10px" onclick="fetchChAccounts()">🔍 Fetch</button>
+          </div>
+        </div>
+        <div id="ch-cfg-status" style="font-size:10px;min-height:14px"></div>
+      </div>
+    </div>
+    <div class="ch-layout">
+      <div class="ch-side">
+        <div class="ch-side-hd">
+          <span>Channels</span>
+          <button class="btn btn-xs btn-dark" onclick="addChannel()">+ New</button>
+        </div>
+        <div class="ch-list" id="ch-list"></div>
+      </div>
+      <div class="ch-main" id="ch-main">
+        <div class="ch-empty">
+          <span style="font-size:36px">📬</span>
+          <span>Select a channel to compose and send</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </div><!-- /content -->
 </div><!-- /main -->
 </div><!-- /shell -->
@@ -769,7 +841,7 @@ function showPage(id,el){
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
   if(el) el.classList.add('active');
-  const titles={dashboard:'Dashboard',screening:'Admission Screening',visits:'Visit Tracker',longitudinal:'Longitudinal Tracking',cases:'Case Management',caseload:'Caseload Control',waitlist:'Waitlist',audit:'Provider Audit',survey:'Patient Satisfaction',guidelines:'Clinical References',email:'Email Report'};
+  const titles={dashboard:'Dashboard',screening:'Admission Screening',visits:'Visit Tracker',longitudinal:'Longitudinal Tracking',cases:'Case Management',caseload:'Caseload Control',waitlist:'Waitlist',audit:'Provider Audit',survey:'Patient Satisfaction',guidelines:'Clinical References',email:'Email Report',channels:'Channels'};
   document.getElementById('page-title').textContent=titles[id]||id;
   document.getElementById('sidebar').classList.remove('open');
   if(id==='longitudinal') renderLongitudinal();
@@ -780,6 +852,7 @@ function showPage(id,el){
   if(id==='survey') renderSurvey();
   if(id==='screening') renderScHistory();
   if(id==='email') loadEmailConfig();
+  if(id==='channels') initChannels();
 }
 
 // ══════════════════════════════════════════════
@@ -2024,6 +2097,194 @@ function sendMailto(){
   const body=encodeURIComponent(document.getElementById('email-body').value.trim());
   window.open('mailto:'+to+'?subject='+subj+'&body='+body);
 }
+
+// ═══════════════════════════════════════════
+// CHANNELS
+// ═══════════════════════════════════════════
+const CH_KEY='hc_channels_v1', CH_HIST_KEY='hc_ch_hist_v1';
+let channels=[], chHistory=[], chSelected=null;
+const CH_COLORS={blue:'var(--blue)',green:'var(--green)',amber:'var(--amber)',red:'var(--red)',purple:'var(--purple)'};
+const CH_COLOR_KEYS=['blue','green','amber','red','purple'];
+
+function initChannels(){
+  channels=load(CH_KEY,[]);
+  chHistory=load(CH_HIST_KEY,[]);
+  if(!channels.length){
+    channels=[
+      {id:'ch_1',name:'Patient Reports',email:'Mudhass22@gmail.com',color:'blue',desc:'Progress & assessment reports'},
+      {id:'ch_2',name:'Urgent Alerts',email:'Mudhass22@gmail.com',color:'red',desc:'Critical clinical alerts'},
+      {id:'ch_3',name:'Referrals',email:'Mudhass22@gmail.com',color:'green',desc:'Provider referral notices'},
+    ];
+    save(CH_KEY,channels);
+  }
+  loadChCfg();
+  renderChList();
+  if(!chSelected && channels.length) selectChannel(channels[0].id);
+  else renderChMain();
+}
+
+function loadChCfg(){
+  document.getElementById('ch-apikey').value=localStorage.getItem('cp_apikey')||'';
+  document.getElementById('ch-account').value=localStorage.getItem('cp_account')||'';
+  document.getElementById('ch-app').value=localStorage.getItem('cp_app')||'GMAIL';
+}
+function saveChCfg(){
+  localStorage.setItem('cp_apikey',document.getElementById('ch-apikey').value);
+  localStorage.setItem('cp_account',document.getElementById('ch-account').value);
+  localStorage.setItem('cp_app',document.getElementById('ch-app').value);
+}
+function toggleChSettings(){
+  const b=document.getElementById('ch-cfg-body');
+  const a=document.getElementById('ch-cfg-arrow');
+  const open=b.style.display==='none';
+  b.style.display=open?'block':'none';
+  a.textContent=open?'▲ collapse':'▼ expand';
+}
+async function fetchChAccounts(){
+  const key=document.getElementById('ch-apikey').value.trim();
+  const st=document.getElementById('ch-cfg-status');
+  if(!key){st.innerHTML='<span style="color:var(--amber)">⚠ Enter API key first.</span>';return;}
+  st.innerHTML='<span style="color:var(--blue)">⏳ Fetching…</span>';
+  try{
+    const r=await fetch('https://backend.composio.dev/api/v1/connectedAccounts',{headers:{'X-API-Key':key}});
+    const d=await r.json();
+    const items=d.items||d.connectedAccounts||[];
+    if(!items.length){st.innerHTML='<span style="color:var(--amber)">⚠ No connected accounts found.</span>';return;}
+    const list=items.map(a=>'<strong>'+a.id+'</strong> ('+( a.appName||'?')+')').join('<br>');
+    st.innerHTML='<span style="color:var(--blue)">'+list+'</span>';
+    if(items.length===1){document.getElementById('ch-account').value=items[0].id;saveChCfg();}
+  }catch(e){st.innerHTML='<span style="color:var(--red)">✗ '+e.message+'</span>';}
+}
+
+function renderChList(){
+  const el=document.getElementById('ch-list');
+  if(!channels.length){el.innerHTML='<div style="padding:12px;font-size:11px;color:var(--text3)">No channels yet.</div>';return;}
+  el.innerHTML=channels.map(ch=>{
+    const cnt=chHistory.filter(h=>h.channelId===ch.id).length;
+    const active=chSelected&&chSelected.id===ch.id?' active':'';
+    return `<div class="ch-item${active}" onclick="selectChannel('${ch.id}')">
+      <div class="ch-item-name"><span class="ch-dot" style="background:${CH_COLORS[ch.color]||CH_COLORS.blue}"></span>${esc(ch.name)}</div>
+      <div class="ch-item-email">${esc(ch.email)}</div>
+      <div class="ch-item-meta">${cnt} sent${ch.desc?' · '+esc(ch.desc):''}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectChannel(id){
+  chSelected=channels.find(c=>c.id===id)||null;
+  renderChList();
+  renderChMain();
+}
+
+function renderChMain(){
+  const el=document.getElementById('ch-main');
+  if(!chSelected){
+    el.innerHTML='<div class="ch-empty"><span style="font-size:36px">📬</span><span>Select a channel to compose and send</span></div>';
+    return;
+  }
+  const ch=chSelected;
+  const hist=chHistory.filter(h=>h.channelId===ch.id).slice(-15).reverse();
+  el.innerHTML=`
+    <div class="ch-main-hd">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="ch-dot" style="background:${CH_COLORS[ch.color]||CH_COLORS.blue};width:10px;height:10px"></span>
+        <div>
+          <div style="font-size:13px;font-weight:600">${esc(ch.name)}</div>
+          <div style="font-size:10px;color:var(--text3)">${esc(ch.email)}</div>
+        </div>
+      </div>
+      <button class="btn btn-xs" style="color:var(--red);border-color:var(--red)" onclick="deleteChannel('${ch.id}')">✕ Remove</button>
+    </div>
+    <div class="ch-compose">
+      <div class="field"><label>Subject</label><input id="ch-subj" value="test"/></div>
+      <div class="field"><label>Message</label><textarea id="ch-body" rows="6" placeholder="Compose your message…"></textarea></div>
+      <div class="btn-row">
+        <button class="btn btn-green" onclick="sendChannel()">✉ Send</button>
+        <button class="btn" onclick="chMailto()">📧 Mail App</button>
+        <span id="ch-send-status" style="font-size:11px;margin-left:6px;align-self:center"></span>
+      </div>
+    </div>
+    ${hist.length?`<div class="ch-hist">
+      <div class="ch-hist-hd">Sent history (${hist.length})</div>
+      ${hist.map(h=>`<div class="ch-hist-row">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span class="ch-hist-subj">${esc(h.subject)}</span>
+          <span class="ch-hist-ts">${new Date(h.sentAt).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span>
+        </div>
+        <div class="ch-hist-prev">${esc(h.body.slice(0,90))}${h.body.length>90?'…':''}</div>
+        <span class="badge ${h.status==='sent'?'b-green':'b-red'}" style="margin-top:3px">${h.status}</span>
+      </div>`).join('')}
+    </div>`:''}
+  `;
+}
+
+function addChannel(){
+  const name=prompt('Channel name:');
+  if(!name||!name.trim())return;
+  const email=prompt('Recipient email:','Mudhass22@gmail.com');
+  if(!email||!email.trim())return;
+  const ch={id:'ch_'+Date.now(),name:name.trim(),email:email.trim(),color:CH_COLOR_KEYS[channels.length%5],desc:''};
+  channels.push(ch);
+  save(CH_KEY,channels);
+  selectChannel(ch.id);
+}
+
+function deleteChannel(id){
+  if(!confirm('Remove this channel?'))return;
+  channels=channels.filter(c=>c.id!==id);
+  save(CH_KEY,channels);
+  chSelected=null;
+  renderChList();
+  renderChMain();
+}
+
+async function sendChannel(){
+  if(!chSelected)return;
+  const key=document.getElementById('ch-apikey').value.trim();
+  const acct=document.getElementById('ch-account').value.trim();
+  const app=document.getElementById('ch-app').value;
+  const subj=document.getElementById('ch-subj').value.trim();
+  const body=document.getElementById('ch-body').value.trim();
+  const st=document.getElementById('ch-send-status');
+  if(!key||!acct){
+    st.innerHTML='<span style="color:var(--amber)">⚠ Open Composio Settings above and enter your API key + account ID.</span>';
+    document.getElementById('ch-cfg-body').style.display='block';
+    document.getElementById('ch-cfg-arrow').textContent='▲ collapse';
+    return;
+  }
+  st.innerHTML='<span style="color:var(--blue)">⏳ Sending…</span>';
+  const action=app==='GMAIL'?'GMAIL_SEND_EMAIL':'MICROSOFT_OUTLOOK_SEND_EMAIL';
+  const input=app==='GMAIL'
+    ?{recipient_email:chSelected.email,subject:subj,body:body}
+    :{to:[{email:chSelected.email}],subject:subj,body:body};
+  const entry={id:'msg_'+Date.now(),channelId:chSelected.id,to:chSelected.email,subject:subj,body:body,sentAt:new Date().toISOString(),status:'failed'};
+  try{
+    const r=await fetch('https://backend.composio.dev/api/v1/actions/'+action+'/execute',{
+      method:'POST',headers:{'Content-Type':'application/json','X-API-Key':key},
+      body:JSON.stringify({connectedAccountId:acct,input})
+    });
+    const d=await r.json();
+    entry.status=(r.ok&&(d.successfull||d.success||d.status==='success'||d.data))?'sent':'failed';
+    st.innerHTML=entry.status==='sent'
+      ?'<span style="color:var(--green)">✓ Sent to '+esc(chSelected.email)+'</span>'
+      :'<span style="color:var(--red)">✗ '+esc(JSON.stringify(d))+'</span>';
+  }catch(e){
+    st.innerHTML='<span style="color:var(--red)">✗ '+esc(e.message)+'</span>';
+  }
+  chHistory.push(entry);
+  save(CH_HIST_KEY,chHistory);
+  renderChList();
+  renderChMain();
+}
+
+function chMailto(){
+  if(!chSelected)return;
+  const subj=encodeURIComponent(document.getElementById('ch-subj').value.trim());
+  const body=encodeURIComponent(document.getElementById('ch-body').value.trim());
+  window.open('mailto:'+chSelected.email+'?subject='+subj+'&body='+body);
+}
+
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 // START
 init();
