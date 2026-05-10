@@ -5,7 +5,7 @@ Usage:  python3 send_test_email.py
 """
 import urllib.request, json, sys
 
-API_KEY      = "ak_uO0QuhjOhKCm0Ghl4WM-"
+API_KEY      = "ak_LugLz3twbjpeIsTHI-VM"
 TO_EMAIL     = "Mudhass22@gmail.com"
 SUBJECT      = "test"
 BODY         = "Test email from the HC Physio system via Composio."
