@@ -294,6 +294,9 @@ input,select,textarea,button{font-family:var(--font);font-size:13px}
     <button class="nav-btn" onclick="showPage('audit',this)"><span class="icon">🔍</span> Provider Audit</button>
     <button class="nav-btn" onclick="showPage('survey',this)"><span class="icon">😊</span> Satisfaction Survey</button>
     <button class="nav-btn" onclick="showPage('guidelines',this)"><span class="icon">📚</span> References</button>
+
+    <div class="nav-sec">Communications</div>
+    <button class="nav-btn" onclick="showPage('email',this)"><span class="icon">✉️</span> Email Report</button>
   </div>
 
   <div class="sidebar-foot">
@@ -672,11 +675,38 @@ input,select,textarea,button{font-family:var(--font);font-size:13px}
     </div>
   </div>
 
+  <!-- ══════════ EMAIL REPORT ══════════ -->
+  <div class="page" id="page-email">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>EmailJS Configuration</div>
+      <div class="form-row">
+        <div class="field"><label>Service ID</label><input id="ejs-service" placeholder="service_xxxxxxx" oninput="saveEmailConfig()"/></div>
+        <div class="field"><label>Template ID</label><input id="ejs-template" placeholder="template_xxxxxxx" oninput="saveEmailConfig()"/></div>
+      </div>
+      <div class="field"><label>Public Key</label><input id="ejs-pubkey" placeholder="your_public_key_here" oninput="saveEmailConfig()"/></div>
+      <p style="font-size:10px;color:var(--text3);margin-top:6px;">Register free at <strong>emailjs.com</strong> → Email Services → create a service, then create a template with variables <code>{{to_email}}</code>, <code>{{subject}}</code>, <code>{{message}}</code>.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>Compose &amp; Send</div>
+      <div class="form-row">
+        <div class="field"><label>To</label><input id="email-to" value="Mudhass22@gmail.com"/></div>
+        <div class="field"><label>Subject</label><input id="email-subject" value="test"/></div>
+      </div>
+      <div class="field"><label>Message</label><textarea id="email-body" rows="7" placeholder="Write your report or message here…"></textarea></div>
+      <div class="btn-row">
+        <button class="btn btn-green" onclick="sendEmailJS()">✉ Send via EmailJS</button>
+        <button class="btn" onclick="sendMailto()">📧 Open in Mail App</button>
+      </div>
+      <div id="email-status" style="margin-top:10px;font-size:12px;min-height:18px;"></div>
+    </div>
+  </div>
+
   </div><!-- /content -->
 </div><!-- /main -->
 </div><!-- /shell -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 // ══════════════════════════════════════════════
 // DATA LAYER — localStorage only, no external calls
@@ -725,7 +755,7 @@ function showPage(id,el){
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
   if(el) el.classList.add('active');
-  const titles={dashboard:'Dashboard',screening:'Admission Screening',visits:'Visit Tracker',longitudinal:'Longitudinal Tracking',cases:'Case Management',caseload:'Caseload Control',waitlist:'Waitlist',audit:'Provider Audit',survey:'Patient Satisfaction',guidelines:'Clinical References'};
+  const titles={dashboard:'Dashboard',screening:'Admission Screening',visits:'Visit Tracker',longitudinal:'Longitudinal Tracking',cases:'Case Management',caseload:'Caseload Control',waitlist:'Waitlist',audit:'Provider Audit',survey:'Patient Satisfaction',guidelines:'Clinical References',email:'Email Report'};
   document.getElementById('page-title').textContent=titles[id]||id;
   document.getElementById('sidebar').classList.remove('open');
   if(id==='longitudinal') renderLongitudinal();
@@ -735,6 +765,7 @@ function showPage(id,el){
   if(id==='audit') renderAudit();
   if(id==='survey') renderSurvey();
   if(id==='screening') renderScHistory();
+  if(id==='email') loadEmailConfig();
 }
 
 // ══════════════════════════════════════════════
@@ -1913,6 +1944,44 @@ function loadDemoData(){
   save(KEYS.visits,visits); save(KEYS.screened,screened); save(KEYS.waitlist,waitlist); save(KEYS.surveys,surveys);
   alert('✓ Demo data loaded — 6 patients, 15 visits, 5 screened, 5 waitlist, 5 surveys.');
   populateDatalist(); renderDashboard();
+}
+
+// ═══════════════════════════════════════════
+// EMAIL — EmailJS + mailto fallback
+// ═══════════════════════════════════════════
+function loadEmailConfig(){
+  document.getElementById('ejs-service').value=localStorage.getItem('ejs_service')||'';
+  document.getElementById('ejs-template').value=localStorage.getItem('ejs_template')||'';
+  document.getElementById('ejs-pubkey').value=localStorage.getItem('ejs_pubkey')||'';
+}
+function saveEmailConfig(){
+  localStorage.setItem('ejs_service',document.getElementById('ejs-service').value);
+  localStorage.setItem('ejs_template',document.getElementById('ejs-template').value);
+  localStorage.setItem('ejs_pubkey',document.getElementById('ejs-pubkey').value);
+}
+function sendEmailJS(){
+  const svc=document.getElementById('ejs-service').value.trim();
+  const tpl=document.getElementById('ejs-template').value.trim();
+  const key=document.getElementById('ejs-pubkey').value.trim();
+  const to=document.getElementById('email-to').value.trim();
+  const subj=document.getElementById('email-subject').value.trim();
+  const body=document.getElementById('email-body').value.trim();
+  const st=document.getElementById('email-status');
+  if(!svc||!tpl||!key){
+    st.innerHTML='<span style="color:var(--amber)">⚠ Enter your EmailJS Service ID, Template ID, and Public Key above first.</span>';
+    return;
+  }
+  st.innerHTML='<span style="color:var(--blue)">⏳ Sending…</span>';
+  emailjs.init(key);
+  emailjs.send(svc,tpl,{to_email:to,subject:subj,message:body})
+    .then(()=>{st.innerHTML='<span style="color:var(--green)">✓ Email sent successfully to '+to+'</span>';})
+    .catch(e=>{st.innerHTML='<span style="color:var(--red)">✗ Failed: '+(e.text||JSON.stringify(e))+'</span>';});
+}
+function sendMailto(){
+  const to=document.getElementById('email-to').value.trim();
+  const subj=encodeURIComponent(document.getElementById('email-subject').value.trim());
+  const body=encodeURIComponent(document.getElementById('email-body').value.trim());
+  window.open('mailto:'+to+'?subject='+subj+'&body='+body);
 }
 
 // START
